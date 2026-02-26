@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] — 2025-02-26
+## [1.0.0] — 2026-02-26
 
 ### ✨ Initial Release
 
@@ -114,7 +114,7 @@ N/A — First release, no migration needed.
 
 ## [Unreleased]
 
-### Planned for v1.1 (Q1 2025)
+### Planned for v1.1 (Q1 2026)
 
 #### Features
 
@@ -139,7 +139,7 @@ N/A — First release, no migration needed.
 - PostgreSQL backend option (replace SQLite for production)
 - Better handling of large configurations (100+ routers)
 
-### Planned for v1.2 (Q2 2025)
+### Planned for v1.2 (Q2 2026)
 
 - GitOps mode (config-as-code in git repository)
 - Advanced middleware composition
@@ -147,7 +147,7 @@ N/A — First release, no migration needed.
 - Rate limiting improvements (per-user, per-IP)
 - Service mesh integration (Istio/Linkerd preview)
 
-### Planned for v2.0 (Q3 2025+)
+### Planned for v2.0 (Q3 2026+)
 
 - Distributed deployment across multiple Traefik clusters
 - Advanced analytics and traffic insights
@@ -162,7 +162,7 @@ N/A — First release, no migration needed.
 
 | Version | Release Date | Status    | Downloads                                                                 |
 | ------- | ------------ | --------- | ------------------------------------------------------------------------- |
-| 1.0.0   | 2025-02-26   | ✅ Stable | [GitHub](https://github.com/genxnext/traefik-manager/releases/tag/v1.0.0) |
+| 1.0.0   | 2026-02-26   | ✅ Stable | [GitHub](https://github.com/genxnext/traefik-manager/releases/tag/v1.0.0) |
 
 ---
 
@@ -254,6 +254,6 @@ For each release, we follow this format:
 
 ---
 
-**Last Updated**: February 2025  
+**Last Updated**: February 2026  
 **Maintainer**: GXNT TECH PVT LTD  
 **Repository**: https://github.com/genxnext/traefik-manager

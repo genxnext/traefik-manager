@@ -66,7 +66,7 @@ class ConfigManager:
         self._load_global_config()
     
     def _load_global_config(self):
-        """Load global configuration from etcd."""
+        """Load global configuration from etcd. Allow None if not configured."""
         config_key = "traefik/config/global"
         config_data = self.etcd.get(config_key)
         
@@ -80,24 +80,29 @@ class ConfigManager:
                         for d in data['domains']
                     ]
                 self._global_config = GlobalConfig(**data)
-            except:
-                self._global_config = self._create_default_global_config()
+            except Exception:
+                self._global_config = None
         else:
-            self._global_config = self._create_default_global_config()
-            self._save_global_config()
+            # Allow empty config (do not auto-create defaults)
+            self._global_config = None
     
     def _save_global_config(self):
-        """Save global configuration to etcd."""
+        """Save global configuration to etcd. Skip if config is None."""
         if self._global_config:
             config_key = "traefik/config/global"
             config_data = json.dumps(asdict(self._global_config))
             self.etcd.put(config_key, config_data)
     
+    def _ensure_global_config(self):
+        """Ensure global config exists; lazily create if None."""
+        if self._global_config is None:
+            self._global_config = self._create_default_global_config()
+    
     def _create_default_global_config(self) -> GlobalConfig:
-        """Create default global configuration."""
+        """Create default global configuration with empty domains. Users add domains after first run."""
         return GlobalConfig(
-            domains=[Domain(name="monoztap.com", cert_resolver="letsencrypt", is_default=True, sans=[])],
-            default_cert_resolver="letsencrypt",
+            domains=[],  # Start empty — users add domains after running app
+            default_cert_resolver="",
             default_entrypoint="websecure",
             default_middlewares=[],
             default_health_endpoint="/health",
@@ -156,23 +161,25 @@ class ConfigManager:
     # Domain Management
     
     def get_domains(self) -> List[Domain]:
-        """Get all registered domains."""
+        """Get all registered domains. Safe to call with empty config."""
         if self._global_config:
-            return self._global_config.domains.copy()
+            return self._global_config.domains.copy() if self._global_config.domains else []
         return []
     
     def get_default_domain(self) -> Optional[Domain]:
-        """Get the default domain."""
-        for domain in self.get_domains():
+        """Get the default domain. Returns None if no config or no domains."""
+        domains = self.get_domains()
+        if not domains:
+            return None
+        for domain in domains:
             if domain.is_default:
                 return domain
         # Return first domain if none marked as default
-        domains = self.get_domains()
-        return domains[0] if domains else None
+        return domains[0]
     
     def add_domain(self, domain: Domain, set_as_default: bool = False) -> bool:
         """
-        Add a domain to the registry.
+        Add a domain to the registry. Auto-initializes config if needed.
         
         Args:
             domain: Domain to add
@@ -181,20 +188,24 @@ class ConfigManager:
         Returns:
             True on success
         """
+        self._ensure_global_config()
+        
         if not self._global_config:
             return False
         
         # Check if domain already exists
-        existing = [d for d in self._global_config.domains if d.name == domain.name]
-        if existing:
+        existing_names = {d.name for d in self._global_config.domains} if self._global_config.domains else set()
+        if domain.name in existing_names:
             return False
         
         # If setting as default, unmark others
-        if set_as_default:
+        if set_as_default and self._global_config.domains:
             for d in self._global_config.domains:
                 d.is_default = False
             domain.is_default = True
         
+        if not self._global_config.domains:
+            self._global_config.domains = []
         self._global_config.domains.append(domain)
         self._save_global_config()
         return True
@@ -209,19 +220,23 @@ class ConfigManager:
         Returns:
             True on success
         """
-        if not self._global_config:
+        if not self._global_config or not self._global_config.domains:
             return False
         
         # Don't allow removing last domain
         if len(self._global_config.domains) <= 1:
             return False
         
-        # Find and remove domain
+        # Find and remove domain, track if it was default
         was_default = False
-        self._global_config.domains = [
-            d for d in self._global_config.domains
-            if d.name != domain_name or (was_default := d.is_default, False)[1]
-        ]
+        new_domains = []
+        for d in self._global_config.domains:
+            if d.name == domain_name:
+                was_default = d.is_default
+            else:
+                new_domains.append(d)
+        
+        self._global_config.domains = new_domains
         
         # If removed domain was default, set first domain as default
         if was_default and self._global_config.domains:
@@ -240,7 +255,7 @@ class ConfigManager:
         Returns:
             True on success
         """
-        if not self._global_config:
+        if not self._global_config or not self._global_config.domains:
             return False
         
         found = False
@@ -269,19 +284,19 @@ class ConfigManager:
         Returns:
             True on success
         """
-        if not self._global_config:
+        if not self._global_config or not self._global_config.domains:
             return False
         
         # Find domain
-        domain = next((d for d in self._global_config.domains if d.name == domain_name), None)
-        if not domain:
+        domain_obj = next((d for d in self._global_config.domains if d.name == domain_name), None)
+        if not domain_obj:
             return False
         
         # Update fields
         if cert_resolver is not None:
-            domain.cert_resolver = cert_resolver
+            domain_obj.cert_resolver = cert_resolver
         if sans is not None:
-            domain.sans = sans
+            domain_obj.sans = sans
         
         self._save_global_config()
         return True

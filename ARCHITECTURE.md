@@ -1,7 +1,7 @@
 # GXNT Traefik Manager — Architecture & Design
 
 **Version:** 1.0  
-**Last Updated:** February 2025  
+**Last Updated:** February 2026  
 **Audience:** Developers, DevOps Engineers, Architects
 
 ---
@@ -530,14 +530,14 @@ def test_create_router():
 - ✅ Backup/restore
 - ✅ Light/dark theme
 
-### v1.1 (Q1 2025)
+### v1.1 (Q1 2026)
 
 - 🔲 REST API (for automation)
 - 🔲 Role-based access control (RBAC)
 - 🔲 Audit logging
 - 🔲 Test coverage (>80%)
 
-### v1.2 (Q2 2025)
+### v1.2 (Q2 2026)
 
 - 🔲 PostgreSQL backend (replace SQLite)
 - 🔲 Metrics export (Prometheus)

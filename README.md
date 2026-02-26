@@ -142,8 +142,8 @@ See [DEPLOYMENT_GUIDE.md — Troubleshooting](DEPLOYMENT_GUIDE.md#troubleshootin
 ## 📈 Roadmap
 
 - **v1.0** (Current) ✅ HTTP/TCP/UDP/TLS, multi-etcd, UI
-- **v1.1** (Q1 2025) REST API, RBAC, audit logging
-- **v1.2** (Q2 2025) PostgreSQL, metrics, webhooks
+- **v1.1** (Q1 2026) REST API, RBAC, audit logging
+- **v1.2** (Q2 2026) PostgreSQL, metrics, webhooks
 - **v2.0+** (Future) GitOps, analytics, service mesh
 
 ---
