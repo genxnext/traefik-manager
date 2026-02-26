@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import btn_outline %}
+{% block title %}Help — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">Help</li>{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div>
+        <h1>Documentation &amp; Reference</h1>
+        <p>Complete guide to Traefik Manager — concepts, fields, workflows, and troubleshooting</p>
+    </div>
+</div>
+
+<div class="accordion" id="helpAccordion">
+
+    <!-- ── 1. Architecture Overview ───────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#sec1">
+                <i class="bi bi-diagram-2 me-2" style="color:#3b82f6;"></i><strong>1. Architecture Overview</strong>
+            </button>
+        </h2>
+        <div id="sec1" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <p>Traefik Manager stores all configuration in <strong>etcd</strong> using a key-value store. Traefik reads this configuration dynamically — changes take effect within seconds, no restart needed.</p>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;">
+                            <div style="font-size:11px;font-weight:600;color:#3b82f6;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">HTTP Layer</div>
+                            <div style="line-height:1.8;">
+                                <span style="color:#1e293b;font-weight:500;">Routers</span> → match incoming requests<br>
+                                <span style="color:#1e293b;font-weight:500;">Services</span> → forward to backend URLs<br>
+                                <span style="color:#1e293b;font-weight:500;">Middlewares</span> → transform requests<br>
+                                <span style="color:#1e293b;font-weight:500;">ServersTransport</span> → backend TLS/conn config
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:14px;">
+                            <div style="font-size:11px;font-weight:600;color:#0891b2;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">TCP / UDP Layer</div>
+                            <div style="line-height:1.8;">
+                                <span style="color:#1e293b;font-weight:500;">TCP Routers</span> → match by SNI/HostSNI<br>
+                                <span style="color:#1e293b;font-weight:500;">TCP Services</span> → backend server pools<br>
+                                <span style="color:#1e293b;font-weight:500;">TCP Middlewares</span> → IP allow-list / rate<br>
+                                <span style="color:#1e293b;font-weight:500;">UDP Routers + Services</span> → raw UDP
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;">
+                            <div style="font-size:11px;font-weight:600;color:#16a34a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">TLS Layer</div>
+                            <div style="line-height:1.8;">
+                                <span style="color:#1e293b;font-weight:500;">TLS Options</span> → cipher suites, versions<br>
+                                <span style="color:#1e293b;font-weight:500;">TLS Stores</span> → default certificates<br>
+                                <span style="color:#1e293b;font-weight:500;">Domains</span> → ACME resolvers per domain<br>
+                                &nbsp;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-1"><strong>etcd Key Prefix:</strong> <code>traefik/</code></p>
+                <p>Example keys: <code>traefik/http/routers/my-router/rule</code>, <code>traefik/tcp/services/my-svc/loadBalancer/servers/0/address</code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 2. Recommended Workflow ─────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec2">
+                <i class="bi bi-play-circle me-2" style="color:#22c55e;"></i><strong>2. Recommended Setup Workflow</strong>
+            </button>
+        </h2>
+        <div id="sec2" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <ol style="line-height:2.2;">
+                    <li><strong>Create a Service</strong> — define the backend URL (e.g. <code>http://app:8080</code>)</li>
+                    <li><strong>Create Middleware(s)</strong> (optional) — add auth, rate limiting, prefix stripping</li>
+                    <li><strong>Create a Router</strong> — set the matching rule, link to service + middlewares, configure TLS</li>
+                    <li><strong>Verify</strong> — check the Routers list; the TLS badge should appear if enabled</li>
+                    <li><strong>Test</strong> — make an HTTP/HTTPS request to the domain; Traefik picks up changes within 2–5 seconds</li>
+                </ol>
+                <div class="alert alert-info" style="font-size:12px;">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Tip:</strong> Always create the Service before the Router — the Router form shows a dropdown of existing services.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 3. HTTP Routers ─────────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec3">
+                <i class="bi bi-signpost-2 me-2" style="color:#3b82f6;"></i><strong>3. HTTP Routers</strong>
+            </button>
+        </h2>
+        <div id="sec3" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Field</th><th>Required</th><th>Description</th><th>Example</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Router Name</strong></td><td>✅</td><td>Unique ID, letters/numbers/-/_ only</td><td><code>api-router</code></td></tr>
+                        <tr><td><strong>Hostname</strong></td><td>Simple mode</td><td>Auto-builds <code>Host(`...`)</code> rule</td><td><code>api.example.com</code></td></tr>
+                        <tr><td><strong>Rule</strong></td><td>Advanced mode</td><td>Full Traefik rule expression</td><td><code>Host(`api.example.com`) &amp;&amp; PathPrefix(`/v1`)</code></td></tr>
+                        <tr><td><strong>Service</strong></td><td>✅</td><td>Backend service name</td><td><code>api-service</code></td></tr>
+                        <tr><td><strong>Entrypoints</strong></td><td>✅</td><td>Comma-separated entrypoint names</td><td><code>web, websecure</code></td></tr>
+                        <tr><td><strong>TLS</strong></td><td>—</td><td>Enable HTTPS; optionally set cert resolver</td><td>Resolver: <code>letsencrypt</code></td></tr>
+                        <tr><td><strong>Middlewares</strong></td><td>—</td><td>Comma-separated middleware names</td><td><code>auth-mw, rate-mw</code></td></tr>
+                        <tr><td><strong>Priority</strong></td><td>—</td><td>Higher value wins when rules overlap (default 0)</td><td><code>100</code></td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Common rule operators:</strong> <code>Host()</code>, <code>PathPrefix()</code>, <code>Path()</code>, <code>Headers()</code>, <code>&amp;&amp;</code>, <code>||</code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 4. HTTP Services ─────────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec4">
+                <i class="bi bi-hdd-network me-2" style="color:#3b82f6;"></i><strong>4. HTTP Services</strong>
+            </button>
+        </h2>
+        <div id="sec4" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <p>Services define the backend servers that handle requests. Each service maps to one backend URL with load-balancing support.</p>
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Field</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Service Name</strong></td><td>✅</td><td>Unique identifier referenced by routers</td></tr>
+                        <tr><td><strong>Backend URL</strong></td><td>✅</td><td>Full URL including scheme and port, e.g. <code>http://backend:8080</code></td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-warning" style="font-size:12px;">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    The <strong>Services</strong> list shows a <strong>Backend URL</strong> column with clickable links. Use <strong>Edit</strong> to safely update the backend — changing a service name requires deleting and recreating the router that references it.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 5. HTTP Middlewares ──────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec5">
+                <i class="bi bi-funnel me-2" style="color:#3b82f6;"></i><strong>5. HTTP Middlewares</strong>
+            </button>
+        </h2>
+        <div id="sec5" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Type</th><th>Fields</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>addPrefix</strong></td><td><code>prefix</code></td><td>Prepend a path prefix. E.g. <code>/api</code> → all requests get <code>/api</code> added</td></tr>
+                        <tr><td><strong>stripPrefix</strong></td><td><code>prefixes</code></td><td>Remove path prefix(es) before forwarding. Comma-separated list</td></tr>
+                        <tr><td><strong>redirectScheme</strong></td><td><code>scheme</code>, <code>permanent</code></td><td>Redirect to another scheme (e.g. <code>http</code> → <code>https</code>). 301 if permanent</td></tr>
+                        <tr><td><strong>rateLimit</strong></td><td><code>average</code>, <code>burst</code>, <code>period</code></td><td>Token-bucket rate limiter. Average req/s, burst cap, window period</td></tr>
+                        <tr><td><strong>basicAuth</strong></td><td><code>users</code>, <code>realm</code></td><td>HTTP Basic Auth. Users in <code>user:htpasswd-hash</code> format, one per line</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 6. ServersTransport ──────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec6">
+                <i class="bi bi-arrow-left-right me-2" style="color:#3b82f6;"></i><strong>6. ServersTransport</strong>
+            </button>
+        </h2>
+        <div id="sec6" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <p>ServersTransport controls how Traefik connects to backend HTTP servers (TLS settings, timeouts, connection pooling).</p>
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Server Name</strong></td><td>Expected TLS ServerName of the backend (for SNI)</td></tr>
+                        <tr><td><strong>Insecure Skip Verify</strong></td><td>Skip backend TLS certificate verification (use only in trusted networks)</td></tr>
+                        <tr><td><strong>Max Idle Conns/Host</strong></td><td>Max idle keep-alive connections per backend host. Default: 200</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 7. TCP Routing ───────────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec7">
+                <i class="bi bi-diagram-3 me-2" style="color:#0891b2;"></i><strong>7. TCP Routing</strong>
+            </button>
+        </h2>
+        <div id="sec7" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <h6 style="font-weight:600;color:#0f172a;">TCP Routers</h6>
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Rule</strong></td><td>HostSNI match. <code>HostSNI(`*`)</code> matches all; <code>HostSNI(`db.example.com`)</code> matches SNI</td></tr>
+                        <tr><td><strong>Service</strong></td><td>Target TCP service (dropdown shows existing services)</td></tr>
+                        <tr><td><strong>Entrypoints</strong></td><td>TCP entrypoint names, e.g. <code>tcp, mysql</code></td></tr>
+                        <tr><td><strong>TLS Passthrough</strong></td><td>Pass TLS directly to backend without Traefik terminating it</td></tr>
+                        <tr><td><strong>Middlewares</strong></td><td>TCP middleware names (ipAllowList, inFlightConn)</td></tr>
+                    </tbody>
+                </table>
+                <h6 style="font-weight:600;color:#0f172a;margin-top:16px;">TCP Services</h6>
+                <p>Server addresses in <code>host:port</code> format. Multiple addresses = load balancing. E.g. <code>db1:5432, db2:5432</code></p>
+                <h6 style="font-weight:600;color:#0f172a;margin-top:16px;">TCP Middlewares</h6>
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Type</th><th>Fields</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>ipAllowList</strong></td><td><code>sourceRange</code></td><td>Allow only listed CIDR ranges. E.g. <code>192.168.0.0/24, 10.0.0.0/8</code></td></tr>
+                        <tr><td><strong>inFlightConn</strong></td><td><code>amount</code></td><td>Max concurrent TCP connections allowed</td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-danger" style="font-size:12px;margin-top:12px;">
+                    <i class="bi bi-shield-exclamation me-2"></i>
+                    <strong>Delete Protection:</strong> Deleting a TCP Service or Middleware that is referenced by a router is blocked. The error message lists which routers are using it.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 8. UDP Routing ───────────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec8">
+                <i class="bi bi-broadcast me-2" style="color:#ea580c;"></i><strong>8. UDP Routing</strong>
+            </button>
+        </h2>
+        <div id="sec8" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <p>UDP routing is stateless — no TLS, no SNI matching. Routers simply forward all traffic on a given entrypoint to a service.</p>
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Entity</th><th>Key Fields</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>UDP Router</strong></td><td>Service (required), Entrypoints (e.g. <code>udp</code>)</td></tr>
+                        <tr><td><strong>UDP Service</strong></td><td>Server addresses: <code>host:port</code>, comma-separated for multiple</td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-danger" style="font-size:12px;margin-top:12px;">
+                    <i class="bi bi-shield-exclamation me-2"></i>
+                    <strong>Delete Protection:</strong> Deleting a UDP Service that is referenced by a UDP router is blocked.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 9. TLS ───────────────────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec9">
+                <i class="bi bi-lock me-2" style="color:#16a34a;"></i><strong>9. TLS Options &amp; Stores</strong>
+            </button>
+        </h2>
+        <div id="sec9" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <h6 style="font-weight:600;color:#0f172a;">TLS Options</h6>
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Min / Max TLS Version</strong></td><td>Restrict TLS versions. Recommended: min <code>TLS 1.2</code></td></tr>
+                        <tr><td><strong>Cipher Suites</strong></td><td>Comma-separated list of allowed cipher suites. Leave blank for Traefik defaults</td></tr>
+                        <tr><td><strong>mTLS / Client Auth</strong></td><td>Mutual TLS — require client certificates. Set CA cert files</td></tr>
+                        <tr><td><strong>SNI Strict</strong></td><td>Reject connections where SNI hostname doesn't match certificate</td></tr>
+                    </tbody>
+                </table>
+                <h6 style="font-weight:600;color:#0f172a;margin-top:16px;">TLS Stores</h6>
+                <p>Define default certificates for TLS termination when no specific domain certificate is configured.</p>
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Cert File / Key File</strong></td><td>Paths to certificate and private key files on the Traefik host</td></tr>
+                        <tr><td><strong>ACME Resolver</strong></td><td>Use Let's Encrypt / ACME to auto-generate certificates</td></tr>
+                        <tr><td><strong>Main Domain / SANs</strong></td><td>Primary domain and Subject Alternative Names for ACME cert</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 10. Config Import / Export ──────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec10">
+                <i class="bi bi-arrow-down-up me-2" style="color:#a855f7;"></i><strong>10. Config Import &amp; Export</strong>
+            </button>
+        </h2>
+        <div id="sec10" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <h6 style="font-weight:600;">Import — HTTP Routers</h6>
+                <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;font-size:11px;">{"http": {"routers": [
+  {"name": "my-router", "rule": "Host(`example.com`)", "service": "my-svc", "entrypoints": ["websecure"]}
+]}}</pre>
+                <h6 style="font-weight:600;margin-top:12px;">Import — HTTP Services (bulk)</h6>
+                <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;font-size:11px;">[
+  {"name": "api-svc",  "url": "http://10.0.0.1:8080"},
+  {"name": "web-svc",  "url": "http://10.0.0.2:80"}
+]</pre>
+                <h6 style="font-weight:600;margin-top:12px;">Export</h6>
+                <p>Downloads a JSON snapshot of all HTTP routers and services currently stored in etcd. Use for backup or migration.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 11. etcd Connections ─────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec11">
+                <i class="bi bi-database-gear me-2" style="color:#64748b;"></i><strong>11. etcd Connection Management</strong>
+            </button>
+        </h2>
+        <div id="sec11" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <p>Traefik Manager can connect to multiple etcd instances. Connections are stored in a local SQLite database and persist across restarts.</p>
+                <ol style="line-height:2;">
+                    <li>Navigate to <strong>Config → etcd Connections</strong> in the sidebar</li>
+                    <li>Click <strong>Add Connection</strong> — enter a name, the etcd URL (e.g. <code>http://10.0.1.5:2379</code>), and an optional description</li>
+                    <li>Click <strong>Connect</strong> on any saved connection to switch the active endpoint immediately</li>
+                    <li>The sidebar bottom always shows the current connection name and health status</li>
+                    <li>On restart, the last active connection is automatically used</li>
+                </ol>
+                <div class="alert alert-info" style="font-size:12px;">
+                    <i class="bi bi-info-circle me-2"></i>
+                    The <code>ETCD_URL</code> environment variable sets the <em>initial</em> default connection when no DB exists. Once a connection is saved in the DB, the DB value takes precedence.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 12. Authentication ───────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec12">
+                <i class="bi bi-shield-lock me-2" style="color:#64748b;"></i><strong>12. Authentication</strong>
+            </button>
+        </h2>
+        <div id="sec12" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <ul style="line-height:2;">
+                    <li><strong>Default credentials:</strong> <code>admin</code> / <code>admin</code></li>
+                    <li>On first login, you are required to change the password before accessing any other page</li>
+                    <li>Passwords are stored as salted SHA-256 hashes in a local SQLite database (<code>traefik_manager.db</code>)</li>
+                    <li>To change your password at any time, click the <i class="bi bi-key"></i> key icon next to your username in the sidebar</li>
+                    <li>To sign out, click the <i class="bi bi-box-arrow-right"></i> icon in the sidebar</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 13. Common Problems ──────────────────────────────────── -->
+    <div class="accordion-item border rounded mb-3" style="border-color:#e2e8f0!important;">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec13">
+                <i class="bi bi-bug me-2" style="color:#ef4444;"></i><strong>13. Troubleshooting &amp; Common Problems</strong>
+            </button>
+        </h2>
+        <div id="sec13" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+            <div class="accordion-body" style="font-size:13px;">
+                <table class="table table-sm" style="font-size:12px;">
+                    <thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead>
+                    <tbody>
+                        <tr><td>Router form shows no services in dropdown</td><td>No services created yet</td><td>Create a Service first, then come back to the Router form</td></tr>
+                        <tr><td>TLS badge missing on router</td><td>TLS not enabled or cert resolver wrong</td><td>Edit router → enable TLS → set resolver name (e.g. <code>letsencrypt</code>)</td></tr>
+                        <tr><td>etcd shows Offline</td><td>Wrong URL or etcd down</td><td>Check Config → etcd Connections; click Edit to fix URL; verify etcd is running</td></tr>
+                        <tr><td>Cannot delete TCP service/middleware</td><td>In use by a router</td><td>The error lists which router(s) use it. Edit those routers first, then delete</td></tr>
+                        <tr><td>Import fails</td><td>Invalid JSON format</td><td>Ensure <code>name</code>, <code>rule</code>, <code>service</code> fields are present. See Import section for exact format</td></tr>
+                        <tr><td>Changes don't appear in Traefik</td><td>Traefik not watching etcd</td><td>Verify Traefik is configured with <code>--providers.etcd=true</code> and correct etcd endpoint</td></tr>
+                        <tr><td>TLS Options dropdown shows wrong version</td><td>Version mismatch</td><td>Versions are stored as <code>VersionTLS12</code> etc. — the UI handles this automatically</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end accordion -->
+
+<!-- Quick Actions -->
+<div class="d-flex flex-wrap gap-2 mt-4">
+    <a href="{{ url_for('http.create_service') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-plus me-1"></i>Create Service</a>
+    <a href="{{ url_for('http.create_middleware') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-plus me-1"></i>Create Middleware</a>
+    <a href="{{ url_for('http.create_router') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-plus me-1"></i>Create Router</a>
+    <a href="{{ url_for('common.settings_connections') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-database-gear me-1"></i>etcd Connections</a>
+    <a href="{{ url_for('http.list_routers') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-list me-1"></i>View Routers</a>
+</div>
+{% endblock %}

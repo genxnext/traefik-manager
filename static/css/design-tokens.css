@@ -1,0 +1,286 @@
+/* ============================================================
+   GXNT Traefik Manager — Design Tokens
+   Single source of truth for every colour, shadow, and radius.
+   Edit values HERE to update the whole application.
+   ============================================================ */
+
+/* ── Light mode (default) ─────────────────────────────────── */
+:root {
+    /* Layout */
+    --sidebar-width:  240px;
+    --header-height:  56px;
+
+    /* App backgrounds */
+    --color-bg:            #f1f5f9;
+    --color-surface:       #ffffff;
+    --color-surface-alt:   #f8fafc;
+    --color-surface-hover: #fafafa;
+    --color-border:        #e2e8f0;
+    --color-border-light:  #f1f5f9;
+
+    /* Text */
+    --color-text-heading:  #0f172a;
+    --color-text-body:     #1e293b;
+    --color-text-label:    #374151;
+    --color-text-muted:    #64748b;
+    --color-text-faint:    #94a3b8;
+    --color-text-subtle:   #475569;
+
+    /* Accent palette */
+    --accent-blue:   #3b82f6;
+    --accent-cyan:   #06b6d4;
+    --accent-orange: #f97316;
+    --accent-green:  #22c55e;
+    --accent-purple: #a855f7;
+
+    /* ── Sidebar ──────────────────────────────────────── */
+    --sidebar-bg:             #ffffff;
+    --sidebar-border:         #e2e8f0;
+    --sidebar-text:           #475569;
+    --sidebar-text-hover:     #0f172a;
+    --sidebar-hover:          #f1f5f9;
+    --sidebar-active:         #3b82f6;
+    --sidebar-active-bg:      rgba(59,130,246,.10);
+    --sidebar-section-label:  #94a3b8;
+    --sidebar-brand-text:     #0f172a;
+    --sidebar-brand-sub:      #64748b;
+    --sidebar-bottom-bg:      #f8fafc;
+    --sidebar-chevron:        #94a3b8;
+
+    /* ── Buttons ──────────────────────────────────────── */
+    --btn-primary-bg:        #0f766e;
+    --btn-primary-bg-hover:  #0d5f59;
+    --btn-primary-bg-active: #0a4f4a;
+    --btn-primary-fg:        #ffffff;
+
+    --btn-success-bg:        #0f766e;
+    --btn-success-bg-hover:  #0d5f59;
+
+    --btn-danger-bg:         #dc2626;
+    --btn-danger-bg-hover:   #b91c1c;
+
+    --btn-outline-fg:        #334155;
+    --btn-outline-border:    #cbd5e1;
+    --btn-outline-hover-bg:  #f1f5f9;
+    --btn-outline-hover-fg:  #0f172a;
+    --btn-outline-hover-border: #94a3b8;
+
+    /* ── Protocol badges ──────────────────────────────── */
+    --badge-http-bg:  rgba(59,130,246,.12);
+    --badge-http-fg:  #2563eb;
+
+    --badge-tcp-bg:   rgba(6,182,212,.12);
+    --badge-tcp-fg:   #0891b2;
+
+    --badge-udp-bg:   rgba(249,115,22,.12);
+    --badge-udp-fg:   #ea580c;
+
+    --badge-tls-bg:   rgba(34,197,94,.12);
+    --badge-tls-fg:   #16a34a;
+
+    --badge-rule-bg:  #f1f5f9;
+    --badge-rule-fg:  #334155;
+
+    /* ── Status badges ────────────────────────────────── */
+    --badge-active-bg:         rgba(34,197,94,.12);
+    --badge-active-fg:         #16a34a;
+
+    --badge-inactive-bg:       #f1f5f9;
+    --badge-inactive-fg:       #94a3b8;
+
+    --badge-warn-bg:           rgba(234,179,8,.12);
+    --badge-warn-fg:           #a16207;
+
+    --badge-neutral-bg:        #f1f5f9;
+    --badge-neutral-fg:        #475569;
+    --badge-neutral-border:    #e2e8f0;
+
+    --badge-positive-bg:       rgba(22,163,74,.10);
+    --badge-positive-fg:       #15803d;
+    --badge-positive-border:   rgba(22,163,74,.20);
+
+    /* ── Alerts ───────────────────────────────────────── */
+    --alert-success-bg:    rgba(34,197,94,.10);
+    --alert-success-border:rgba(34,197,94,.20);
+    --alert-success-fg:    #16a34a;
+
+    --alert-danger-bg:     rgba(239,68,68,.10);
+    --alert-danger-border: rgba(239,68,68,.20);
+    --alert-danger-fg:     #dc2626;
+
+    --alert-warning-bg:    rgba(234,179,8,.10);
+    --alert-warning-border:rgba(234,179,8,.20);
+    --alert-warning-fg:    #a16207;
+
+    --alert-info-bg:       rgba(59,130,246,.10);
+    --alert-info-border:   rgba(59,130,246,.20);
+    --alert-info-fg:       #2563eb;
+
+    /* ── Misc UI ──────────────────────────────────────── */
+    --color-dot-healthy:   #22c55e;
+    --color-dot-error:     #ef4444;
+    --color-link-focus:    #3b82f6;
+    --color-loader-ring:   #cbd5e1;
+    --color-loader-top:    #2563eb;
+    --color-skeleton-a:    #e2e8f0;
+    --color-skeleton-b:    #f1f5f9;
+    --color-rule-code-bg:  #f1f5f9;
+    --color-rule-code-fg:  #334155;
+    --color-inline-empty-bg:    #f8fafc;
+    --color-inline-empty-border:#cbd5e1;
+    --color-inline-empty-fg:    #64748b;
+
+    /* ── Typography ──────────────────────────────────────────────── */
+    --color-form-border:   #d1d5db;   /* input/select border         */
+    --color-form-text:     #9ca3af;   /* form help text              */
+    --color-section-title: #6b7280;   /* form section heading        */
+    --color-section-border:#f3f4f6;   /* form section bottom border  */
+    --color-empty-icon:    #cbd5e1;   /* empty-state large icon      */
+
+    /* ── Structural shadows ───────────────────────────────────────── */
+    --shadow-card:         0 2px 8px rgba(2,6,23,0.04);
+    --shadow-hover:        0 4px 16px rgba(0,0,0,.08);
+    --shadow-modal:        0 14px 40px rgba(15,23,42,0.16);
+
+    /* ── Misc ─────────────────────────────────────────────────────── */
+    --color-breadcrumb-active: #1e293b;
+    --color-table-hover:       #fafafa;
+    --color-focus-ring:        rgba(59,130,246,.2);
+    --color-page-loader-bg:    rgba(241,245,249,0.72);
+    --color-tbl-name:          #0f172a;
+    --color-tbl-muted:         #94a3b8;
+
+    /* ── Skeleton / loading ───────────────────────────────────────── */
+    --color-skeleton-a:    #e2e8f0;
+    --color-skeleton-b:    #f1f5f9;
+
+    /* ── Dropdown ─────────────────────────────────────────────────── */
+    --color-dropdown-bg:   #ffffff;
+    --color-dropdown-border:#e2e8f0;
+    --color-dropdown-item: #374151;
+    --color-dropdown-hover:#f1f5f9;
+    --color-dropdown-item-hover: #0f172a;
+
+    /* ── Nav avatar ────────────────────────────────────────────────── */
+    --color-avatar-bg:     #3b82f6;
+    --color-avatar-fg:     #ffffff;
+}
+
+/* ── Dark mode overrides ──────────────────────────────────── */
+[data-bs-theme="dark"] {
+    /* App backgrounds */
+    --color-bg:            #0b1120;
+    --color-surface:       #0f172a;
+    --color-surface-alt:   #111827;
+    --color-surface-hover: #111827;
+    --color-border:        #1e293b;
+    --color-border-light:  #1e293b;
+
+    /* Text */
+    --color-text-heading:  #f1f5f9;
+    --color-text-body:     #e2e8f0;
+    --color-text-label:    #d1d5db;
+    --color-text-muted:    #94a3b8;
+    --color-text-faint:    #64748b;
+    --color-text-subtle:   #94a3b8;
+
+    /* Sidebar dark */
+    --sidebar-bg:             #0f172a;
+    --sidebar-border:         #1e293b;
+    --sidebar-text:           #94a3b8;
+    --sidebar-text-hover:     #e2e8f0;
+    --sidebar-hover:          #1e293b;
+    --sidebar-active-bg:      rgba(59,130,246,.15);
+    --sidebar-section-label:  #475569;
+    --sidebar-brand-text:     #f8fafc;
+    --sidebar-brand-sub:      #64748b;
+    --sidebar-bottom-bg:      #1e293b;
+    --sidebar-chevron:        #475569;
+
+    /* Protocol badges dark */
+    --badge-http-bg:  rgba(59,130,246,.18);
+    --badge-http-fg:  #60a5fa;
+
+    --badge-tcp-bg:   rgba(6,182,212,.18);
+    --badge-tcp-fg:   #22d3ee;
+
+    --badge-udp-bg:   rgba(249,115,22,.18);
+    --badge-udp-fg:   #fb923c;
+
+    --badge-tls-bg:   rgba(34,197,94,.18);
+    --badge-tls-fg:   #4ade80;
+
+    --badge-rule-bg:  #111827;
+    --badge-rule-fg:  #94a3b8;
+
+    /* Status badges dark */
+    --badge-active-bg:         rgba(34,197,94,.18);
+    --badge-active-fg:         #4ade80;
+
+    --badge-inactive-bg:       #1e293b;
+    --badge-inactive-fg:       #64748b;
+
+    --badge-warn-bg:           rgba(234,179,8,.18);
+    --badge-warn-fg:           #fbbf24;
+
+    --badge-neutral-bg:        #1e293b;
+    --badge-neutral-fg:        #94a3b8;
+    --badge-neutral-border:    #374151;
+
+    --badge-positive-bg:       rgba(22,163,74,.18);
+    --badge-positive-fg:       #4ade80;
+    --badge-positive-border:   rgba(22,163,74,.25);
+
+    /* Alerts dark */
+    --alert-success-fg:    #4ade80;
+    --alert-danger-fg:     #f87171;
+    --alert-warning-fg:    #fbbf24;
+    --alert-info-fg:       #60a5fa;
+
+    /* Misc dark */
+    --color-dot-error:         #ef4444;
+    --color-loader-ring:       #1e293b;
+    --color-loader-top:        #3b82f6;
+    --color-rule-code-bg:      #111827;
+    --color-rule-code-fg:      #93c5fd;
+    --color-inline-empty-bg:   #111827;
+    --color-inline-empty-border:#374151;
+    --color-inline-empty-fg:   #64748b;
+
+    /* Outline buttons dark */
+    --btn-outline-fg:           #94a3b8;
+    --btn-outline-border:       #374151;
+    --btn-outline-hover-bg:     #1e293b;
+    --btn-outline-hover-fg:     #f1f5f9;
+    --btn-outline-hover-border: #4b5563;
+
+    /* Structural dark overrides */
+    --color-form-border:   #374151;
+    --color-form-text:     #4b5563;
+    --color-section-title: #4b5563;
+    --color-section-border:#1e293b;
+    --color-empty-icon:    #374151;
+    --color-breadcrumb-active: #e2e8f0;
+    --color-table-hover:   #111827;
+    --color-page-loader-bg:rgba(11,17,32,.78);
+    --color-tbl-name:      #f1f5f9;
+    --color-tbl-muted:     #64748b;
+
+    /* Skeleton dark */
+    --color-skeleton-a:    #1e293b;
+    --color-skeleton-b:    #111827;
+
+    /* Dropdown dark */
+    --color-dropdown-bg:   #111827;
+    --color-dropdown-border:#1e293b;
+    --color-dropdown-item: #d1d5db;
+    --color-dropdown-hover:#1e293b;
+    --color-dropdown-item-hover: #f1f5f9;
+
+    /* Outline buttons dark */
+    --btn-outline-danger-fg:    #f87171;
+    --btn-outline-danger-border:#7f1d1d;
+    --btn-outline-danger-hover-bg: rgba(239,68,68,.1);
+    --btn-outline-primary-fg:   #60a5fa;
+    --btn-outline-primary-border:#1d4ed8;
+}

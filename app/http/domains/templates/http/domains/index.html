@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}Domains — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">Config</li><li class="breadcrumb-item active">Domains</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('Domains', 'Manage domain names and certificate resolver associations', url_for('http.create_domain'), 'Create Domain') }}
+
+{% if domains %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:40px;">#</th>
+                <th>Domain</th>
+                <th>Cert Resolver</th>
+                <th>SANs</th>
+                <th>Default</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for domain in domains %}
+            <tr>
+                <td class="tbl-muted">{{ loop.index }}</td>
+                <td><span class="tbl-name">{{ domain.name }}</span></td>
+                <td><span class="tbl-muted">{{ domain.cert_resolver or '—' }}</span></td>
+                <td>
+                    {% if domain.sans %}
+                        {% for san in domain.sans %}
+                        <span class="badge badge-neutral me-1">{{ san }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="tbl-muted">None</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if domain.is_default %}
+                    <span class="badge badge-tls"><i class="bi bi-star-fill me-1"></i>Default</span>
+                    {% else %}
+                    <span class="tbl-muted">—</span>
+                    {% endif %}
+                </td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        {% if not domain.is_default %}
+                        <form method="POST" action="{{ url_for('http.set_default_domain', name=domain.name) }}" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Set as default"><i class="bi bi-star"></i></button>
+                        </form>
+                        {% endif %}
+                        <a href="{{ url_for('http.edit_domain', name=domain.name) }}" class="btn btn-sm btn-outline-secondary" title="Edit domain"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('http.delete_domain', name=domain.name), domain.name, 'domain') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ domains|length }} domain(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-globe2', 'No domains yet', 'Domains associate hostnames with certificate resolvers for automatic HTTPS provisioning.', url_for('http.create_domain'), 'Create Domain') }}
+{% endif %}
+{% endblock %}

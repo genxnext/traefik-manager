@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}TLS Stores — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">TLS</li><li class="breadcrumb-item active">Stores</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('TLS Stores', 'Default certificate stores and generated certificate configuration', url_for('tls.create_tls_store'), 'Create TLS Store') }}
+
+{% if stores %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Default Certificate</th>
+                <th>Generated Cert Resolver</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for store in stores %}
+            <tr>
+                <td><span class="tbl-name">{{ store.name }}</span></td>
+                <td>
+                    {% if store.default_certificate_cert %}
+                    <span class="badge badge-tls"><i class="bi bi-file-earmark-lock-fill me-1"></i>Configured</span>
+                    {% else %}
+                    <span class="tbl-muted">None</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if store.default_generated_cert_resolver %}
+                    <span class="tbl-name">{{ store.default_generated_cert_resolver }}</span>
+                    {% if store.default_generated_cert_domain_main %}
+                    <div class="tbl-muted">{{ store.default_generated_cert_domain_main }}</div>
+                    {% endif %}
+                    {% else %}
+                    <span class="tbl-muted">None</span>
+                    {% endif %}
+                </td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('tls.edit_tls_store', name=store.name) }}" class="btn btn-sm btn-outline-secondary" title="Edit store"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('tls.delete_tls_store', name=store.name), store.name, 'TLS store') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ stores|length }} TLS store(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-safe', 'No TLS stores yet', 'TLS stores hold default certificate configurations and generated certificate resolver settings.', url_for('tls.create_tls_store'), 'Create TLS Store') }}
+{% endif %}
+{% endblock %}

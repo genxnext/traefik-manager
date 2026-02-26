@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}TCP Services — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">TCP</li><li class="breadcrumb-item active">Services</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('TCP Services', 'Backend TCP server pools that receive forwarded connections from TCP routers', url_for('tcp.create_tcp_service'), 'Create TCP Service') }}
+
+{% if services %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:40px;">#</th>
+                <th>Name</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in services %}
+            <tr>
+                <td class="tbl-muted">{{ loop.index }}</td>
+                <td><span class="tbl-name">{{ service }}</span></td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('tcp.edit_tcp_service', name=service) }}" class="btn btn-sm btn-outline-secondary" title="Edit service"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('tcp.delete_tcp_service', name=service), service, 'service') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ services|length }} TCP service(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-server', 'No TCP services yet', 'TCP services define backend server pools that handle raw TCP traffic forwarded by your routers.', url_for('tcp.create_tcp_service'), 'Create TCP Service') }}
+{% endif %}
+{% endblock %}

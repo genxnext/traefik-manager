@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import form_footer %}
+
+{% block title %}Create UDP Router — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">UDP</li><li class="breadcrumb-item active">Create UDP Router</li>{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-12 col-xl-9">
+        <div class="form-card">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h1 class="h4 mb-1">Create UDP Router</h1>
+                    <p class="text-muted mb-0">Only predefined Traefik option values are allowed.</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-udp">UDP</span>
+                    <a href="{{ url_for('udp.list_udp_routers') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Back to UDP Routers
+                    </a>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('udp.create_udp_router') }}">
+                <div class="form-section-title">Identity</div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Router Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name"
+                           value="{{ form_data.get('name', '') if form_data else '' }}"
+                           placeholder="my-udp-router" required pattern="[a-zA-Z0-9_\-]+"
+                           title="Only alphanumeric, hyphens, and underscores allowed">
+                </div>
+
+                <div class="form-section-title mt-4">Routing Targets</div>
+                <div class="mb-3">
+                    <label for="service" class="form-label">Service <span class="text-danger">*</span></label>
+                    <select class="form-select" id="service" name="service" required {% if not udp_services %}disabled{% endif %}>
+                        <option value="">-- Select UDP Service --</option>
+                        {% for svc in udp_services %}
+                        <option value="{{ svc }}" {% if form_data and form_data.get('service') == svc %}selected{% endif %}>{{ svc }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not udp_services %}
+                    <div class="form-text text-warning">No UDP services available. Create one first.</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Entrypoints <span class="text-danger">*</span></label>
+                    <div class="row g-2">
+                        {% for ep in entrypoint_options %}
+                        <div class="col-md-6">
+                            <label class="border rounded px-3 py-2 d-flex align-items-center gap-2 w-100 bg-light-subtle">
+                                <input class="form-check-input mt-0" type="checkbox" name="entrypoints" value="{{ ep.value }}"
+                                       {% if ep.value in selected_entrypoints %}checked{% endif %}>
+                                <span>{{ ep.label }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {{ form_footer(url_for('udp.list_udp_routers'), 'Create UDP Router') }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

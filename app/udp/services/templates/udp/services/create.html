@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Create UDP Service — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">UDP</li><li class="breadcrumb-item active">Create UDP Service</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Create UDP Service', url_for('udp.list_udp_services'), 'Back to UDP Services') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('udp.create_udp_service') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Service Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ form_data.get('name', '') if form_data else '' }}"
+                               placeholder="my-udp-service" required
+                               pattern="[a-zA-Z0-9_\-]+"
+                               title="Only alphanumeric, hyphens, and underscores allowed">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addresses" class="form-label">Server Addresses <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="addresses" name="addresses"
+                               value="{{ form_data.get('addresses', '') if form_data else '' }}"
+                               placeholder="192.168.1.10:5353, 192.168.1.11:5353" required>
+                        <div class="form-text">Comma-separated list of server addresses (host:port)</div>
+                    </div>
+
+                    {{ form_footer(url_for('udp.list_udp_services'), 'Create UDP Service') }}
+                </form>
+{% endblock %}

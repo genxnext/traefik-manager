@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Runtime data
+*.db
+*.log
+nohup.out
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Build / tooling
+.playwright-mcp/

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}TCP Routers — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">TCP</li><li class="breadcrumb-item active">Routers</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('TCP Routers', 'Route raw TCP connections by SNI or HostSNI rules to backend TCP services', url_for('tcp.create_tcp_router'), 'Create TCP Router') }}
+
+{% if routers %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Rule</th>
+                <th>Service</th>
+                <th>Entrypoints</th>
+                <th>TLS</th>
+                <th>Middlewares</th>
+                <th>Priority</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for router in routers %}
+            {% set rname = router.name if router.name is defined else router['name'] %}
+            <tr>
+                <td><span class="tbl-name">{{ rname }}</span></td>
+                <td><span class="rule-code" title="{{ router.rule if router.rule is defined else router.get('rule', '') }}">{{ router.rule if router.rule is defined else router.get('rule', '') }}</span></td>
+                <td><span class="tbl-muted">{{ router.service if router.service is defined else router.get('service', '') }}</span></td>
+                <td>
+                    {% set eps = router.entrypoints if router.entrypoints is defined else router.get('entrypoints', []) %}
+                    {% for ep in eps %}
+                    <span class="badge badge-tcp me-1">{{ ep }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% set tls_pass = router.tls_passthrough if router.tls_passthrough is defined else router.get('tls_passthrough', false) %}
+                    {% set tls_cfg = router.tls if router.tls is defined else router.get('tls', none) %}
+                    {% if tls_pass %}
+                    <span class="badge badge-warn">Passthrough</span>
+                    {% elif tls_cfg %}
+                    <span class="badge badge-tls"><i class="bi bi-lock-fill me-1"></i>TLS</span>
+                    {% else %}
+                    <span class="tbl-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% set mws = router.middlewares if router.middlewares is defined else router.get('middlewares', []) %}
+                    {% if mws %}
+                        {% for mw in mws %}
+                        <span class="badge badge-neutral me-1">{{ mw }}</span>
+                        {% endfor %}
+                    {% else %}
+                    <span class="tbl-muted">—</span>
+                    {% endif %}
+                </td>
+                <td><span class="tbl-muted">{{ router.priority if router.priority is defined else router.get('priority', 0) }}</span></td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('tcp.edit_tcp_router', name=rname) }}" class="btn btn-sm btn-outline-secondary" title="Edit router"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('tcp.delete_tcp_router', name=rname), rname, 'router') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ routers|length }} TCP router(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-diagram-3', 'No TCP routers yet', 'TCP routers handle raw TCP connections. Use HostSNI rules to route traffic to backend services.', url_for('tcp.create_tcp_router'), 'Create TCP Router') }}
+{% endif %}
+{% endblock %}

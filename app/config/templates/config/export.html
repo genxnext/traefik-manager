@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Export Configuration — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">Config</li><li class="breadcrumb-item active">Export</li>{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Export Configuration</h1>
+        <p>Download your Traefik configuration or create a full backup for migration</p>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:860px;">
+
+    <!-- Full Backup card -->
+    <div class="data-table" style="padding:28px;border-radius:14px;">
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;">
+            <div style="width:44px;height:44px;border-radius:12px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-database-down" style="font-size:20px;color:#3b82f6;"></i>
+            </div>
+            <div>
+                <h3 style="font-size:15px;font-weight:700;margin:0 0 4px;color:inherit;">Full Backup</h3>
+                <p class="tbl-muted" style="margin:0;font-size:12px;line-height:1.4;">
+                    Exports <strong>all etcd keys</strong> under <code>/traefik/</code> plus your
+                    <strong>connection profiles</strong> (no user accounts). Use this to fully
+                    replicate a setup on a new install.
+                </p>
+            </div>
+        </div>
+
+        <ul style="font-size:12px;color:#64748b;padding-left:18px;margin-bottom:20px;line-height:1.7;">
+            <li>All HTTP/TCP/UDP/TLS router, service, middleware keys</li>
+            <li>TLS options, stores, domains</li>
+            <li>etcd connection profiles (URL + name)</li>
+            <li><em>Not included: user accounts &amp; passwords</em></li>
+        </ul>
+
+        <a href="{{ url_for('config.export_full_backup') }}"
+           class="btn btn-outline-secondary w-100">
+            <i class="bi bi-download me-1"></i>Download Full Backup <span style="font-size:10px;opacity:.7;">.json</span>
+        </a>
+    </div>
+
+    <!-- Config-only card -->
+    <div class="data-table" style="padding:28px;border-radius:14px;">
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;">
+            <div style="width:44px;height:44px;border-radius:12px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-file-earmark-code" style="font-size:20px;color:#16a34a;"></i>
+            </div>
+            <div>
+                <h3 style="font-size:15px;font-weight:700;margin:0 0 4px;color:inherit;">Config Snapshot</h3>
+                <p class="tbl-muted" style="margin:0;font-size:12px;line-height:1.4;">
+                    Exports parsed routers, services, and middlewares as a structured JSON
+                    snapshot. Useful for version-control or sharing individual config blocks.
+                </p>
+            </div>
+        </div>
+
+        <ul style="font-size:12px;color:#64748b;padding-left:18px;margin-bottom:20px;line-height:1.7;">
+            <li>Parsed HTTP routers, services, middlewares</li>
+            <li>Structured format (importable via Import page)</li>
+            <li>Does not contain raw etcd keys or connections</li>
+            <li>&nbsp;</li>
+        </ul>
+
+        <a href="{{ url_for('config.export_config_download') }}"
+           class="btn btn-outline-secondary w-100">
+            <i class="bi bi-download me-1"></i>Download Config Snapshot <span style="font-size:10px;opacity:.7;">.json</span>
+        </a>
+    </div>
+
+</div>
+
+<div class="data-table mt-4" style="max-width:860px;padding:20px 24px;">
+    <p class="form-section-title mb-2">Restore a backup</p>
+    <p style="font-size:13px;color:#64748b;margin-bottom:12px;">
+        To restore a full backup on a fresh install, go to
+        <a href="{{ url_for('config.import_config') }}#backup">Import → Full Backup</a>
+        and upload the <code>.json</code> file you downloaded here.
+    </p>
+    <a href="{{ url_for('config.import_config') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-upload me-1"></i>Go to Import
+    </a>
+</div>
+{% endblock %}

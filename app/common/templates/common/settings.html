@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+{% block title %}etcd Connections — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">etcd Connections</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('etcd Connections', 'Manage and switch between etcd endpoints for this control plane.', '#add-connection', 'Connect New') }}
+
+{% if load_error %}
+<div class="alert alert-danger d-flex align-items-start gap-2">
+    <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+    <div>
+        <strong>Connections are temporarily unavailable.</strong>
+        <div>{{ load_error }}</div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Existing connections table -->
+<div class="data-table mb-4">
+    <div class="table-title">
+        <span><i class="bi bi-database me-2 text-primary"></i>Saved Connections</span>
+        <span class="text-muted small">{{ connections|length }} configured</span>
+    </div>
+    {% if connections %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conn in connections %}
+                <tr class="{% if conn.is_active %}table-primary{% endif %}">
+                    <td>
+                        <strong>{{ conn.name }}</strong>
+                        {% if conn.is_active %}<span class="badge badge-active ms-2">ACTIVE</span>{% endif %}
+                    </td>
+                    <td><code>{{ conn.url }}</code></td>
+                    <td class="tbl-muted">{{ conn.description or '—' }}</td>
+                    <td>
+                        {% if conn.is_active %}
+                        <span class="badge badge-active">
+                            <i class="bi bi-circle-fill me-1"></i>Active
+                        </span>
+                        {% else %}
+                        <span class="badge badge-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <!-- Activate -->
+                            {% if not conn.is_active %}
+                            <form method="POST" action="{{ url_for('common.settings_connections_activate', conn_id=conn.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Connect">
+                                    <i class="bi bi-plug me-1"></i>Connect
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <!-- Edit -->
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    data-edit-base="{{ url_for('common.settings_connections_edit', conn_id=0)[:-1] }}"
+                                    data-id="{{ conn.id }}"
+                                    data-name="{{ conn.name }}"
+                                    data-url="{{ conn.url }}"
+                                    data-desc="{{ conn.description }}"
+                                    title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <!-- Delete -->
+                            {% if connections|length > 1 %}
+                            {{ btn_danger(url_for('common.settings_connections_delete', conn_id=conn.id), conn.name, 'connection') }}
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    {{ empty_state('bi-database', 'No connections saved', 'Add your first etcd endpoint to continue.', '') }}
+    {% endif %}
+</div>
+
+<!-- Add new connection card -->
+<div class="form-card" id="add-connection" style="max-width:620px;">
+    <div class="form-section-title">Add New Connection</div>
+    <div class="field-help mb-3">
+        Use separate named connections for environments (for example: staging, production).
+        <button type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline" data-bs-toggle="tooltip" title="The manager stores endpoint metadata locally and switches the active target globally.">
+            <i class="bi bi-info-circle"></i>
+        </button>
+    </div>
+    <form method="POST" action="{{ url_for('common.settings_connections_add') }}">
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <label class="form-label">Connection Name *</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Production" required>
+                <div class="field-help">Readable label shown in sidebar and status card.</div>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">etcd URL *</label>
+                <input type="url" name="url" class="form-control" placeholder="http://10.0.0.1:2379" required>
+                <div class="field-help">Must include scheme + host + port, such as <code>http://127.0.0.1:2379</code>.</div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Description</label>
+                <input type="text" name="description" class="form-control" placeholder="Optional note about this endpoint">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus me-1"></i>Add Connection
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Edit modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="font-size:15px;">Edit Connection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="editForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name *</label>
+                        <input type="text" name="name" id="edit_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL *</label>
+                        <input type="url" name="url" id="edit_url" class="form-control" required>
+                        <div class="field-help">Use a full URL with scheme and port.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" id="edit_desc" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('editModal').addEventListener('show.bs.modal', function(e) {
+    var btn = e.relatedTarget;
+    document.getElementById('edit_name').value = btn.dataset.name;
+    document.getElementById('edit_url').value  = btn.dataset.url;
+    document.getElementById('edit_desc').value = btn.dataset.desc;
+    var editBase = btn.dataset.editBase || '{{ url_for("common.settings_connections_edit", conn_id=0)[:-1] }}';
+    document.getElementById('editForm').action = editBase + btn.dataset.id;
+});
+</script>
+{% endblock %}

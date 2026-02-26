@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}UDP Routers — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">UDP</li><li class="breadcrumb-item active">Routers</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('UDP Routers', 'Route UDP traffic by entrypoint to backend UDP services', url_for('udp.create_udp_router'), 'Create UDP Router') }}
+
+{% if routers %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Service</th>
+                <th>Entrypoints</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for router in routers %}
+            {% set rname = router.name if router.name is defined else router['name'] %}
+            <tr>
+                <td><span class="tbl-name">{{ rname }}</span></td>
+                <td><span class="tbl-muted">{{ router.service if router.service is defined else router.get('service', '') }}</span></td>
+                <td>
+                    {% set eps = router.entrypoints if router.entrypoints is defined else router.get('entrypoints', []) %}
+                    {% for ep in eps %}
+                    <span class="badge badge-udp me-1">{{ ep }}</span>
+                    {% endfor %}
+                </td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('udp.edit_udp_router', name=rname) }}" class="btn btn-sm btn-outline-secondary" title="Edit router"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('udp.delete_udp_router', name=rname), rname, 'router') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ routers|length }} UDP router(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-broadcast', 'No UDP routers yet', 'UDP routers forward stateless UDP traffic by entrypoint to backend UDP services.', url_for('udp.create_udp_router'), 'Create UDP Router') }}
+{% endif %}
+{% endblock %}

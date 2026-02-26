@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import empty_state %}
+{% block title %}Dashboard — Traefik Manager{% endblock %}
+
+{% block content %}
+<!-- ── PAGE HEADER ────────────────────────────────── -->
+<div class="page-header mb-4">
+    <div>
+        <h1 style="font-size:22px;">Dashboard</h1>
+        <p style="font-size:13px;color:#64748b;">
+            {% if etcd_healthy %}
+            <span style="color:#22c55e;"><i class="bi bi-circle-fill me-1" style="font-size:8px;"></i>Connected</span>
+            {% else %}
+            <span style="color:#ef4444;"><i class="bi bi-circle-fill me-1" style="font-size:8px;"></i>etcd offline</span>
+            {% endif %}
+            &nbsp;·&nbsp;<code style="font-size:11px;color:#94a3b8;">{{ etcd_url_display }}</code>
+        </p>
+    </div>
+    <a href="{{ url_for('http.create_router') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-plus me-1"></i>New Router
+    </a>
+</div>
+
+<!-- ── SUMMARY STATS ─────────────────────────────── -->
+<div class="data-table mb-4">
+    <div class="data-table">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th colspan="4" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#3b82f6;">
+                        <i class="bi bi-globe me-1"></i>HTTP
+                    </th>
+                    <th colspan="3" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#0891b2;border-left:2px solid #e2e8f0;">
+                        <i class="bi bi-diagram-3 me-1"></i>TCP
+                    </th>
+                    <th colspan="2" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#ea580c;border-left:2px solid #e2e8f0;">
+                        <i class="bi bi-broadcast me-1"></i>UDP
+                    </th>
+                    <th colspan="2" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#16a34a;border-left:2px solid #e2e8f0;">
+                        <i class="bi bi-lock me-1"></i>TLS
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('http.list_routers') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#3b82f6;line-height:1;">{{ router_count }}</span><span style="font-size:12px;color:#94a3b8;">Routers</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('http.list_services') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#3b82f6;line-height:1;">{{ service_count }}</span><span style="font-size:12px;color:#94a3b8;">Services</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('http.list_middlewares') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#3b82f6;line-height:1;">{{ middleware_count }}</span><span style="font-size:12px;color:#94a3b8;">Middlewares</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('http.list_domains') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#a855f7;line-height:1;">{{ domain_count }}</span><span style="font-size:12px;color:#94a3b8;">Domains</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;border-left:2px solid #e2e8f0;"><a href="{{ url_for('tcp.list_tcp_routers') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#0891b2;line-height:1;">{{ tcp_router_count }}</span><span style="font-size:12px;color:#94a3b8;">Routers</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('tcp.list_tcp_services') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#0891b2;line-height:1;">{{ tcp_service_count }}</span><span style="font-size:12px;color:#94a3b8;">Services</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('http.list_servers_transports') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#0891b2;line-height:1;">{{ st_count }}</span><span style="font-size:12px;color:#94a3b8;">Transports</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;border-left:2px solid #e2e8f0;"><a href="{{ url_for('udp.list_udp_routers') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#ea580c;line-height:1;">{{ udp_router_count }}</span><span style="font-size:12px;color:#94a3b8;">Routers</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('udp.list_udp_services') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#ea580c;line-height:1;">{{ udp_service_count }}</span><span style="font-size:12px;color:#94a3b8;">Services</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;border-left:2px solid #e2e8f0;"><a href="{{ url_for('tls.list_tls_options') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#16a34a;line-height:1;">{{ tls_options_count }}</span><span style="font-size:12px;color:#94a3b8;">Options</span></a></td>
+                    <td style="padding:18px 20px;border-bottom:0;"><a href="{{ url_for('tls.list_tls_stores') }}" class="text-decoration-none d-flex align-items-baseline gap-2"><span style="font-size:26px;font-weight:700;color:#16a34a;line-height:1;">{{ tls_store_count }}</span><span style="font-size:12px;color:#94a3b8;">Stores</span></a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ── HTTP ROUTERS TABLE ─────────────────────────── -->
+<div class="data-table">
+    <div class="table-title">
+        <span><i class="bi bi-signpost-2 me-2" style="color:#3b82f6;"></i>HTTP Routers</span>
+        <a href="{{ url_for('http.list_routers') }}" class="btn btn-sm btn-outline-secondary">View all →</a>
+    </div>
+    {% if recent_routers %}
+    <div class="data-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Rule</th>
+                    <th>Service</th>
+                    <th>Entrypoints</th>
+                    <th>TLS</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in recent_routers %}
+                <tr>
+                    <td><strong>{{ r.name }}</strong></td>
+                    <td><span class="badge badge-rule">{{ r.rule }}</span></td>
+                    <td style="font-size:13px;">{{ r.service }}</td>
+                    <td>
+                        {% for ep in r.entrypoints %}
+                        <span class="badge badge-http me-1">{{ ep }}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if r.tls %}
+                        <span class="badge badge-tls"><i class="bi bi-lock-fill me-1"></i>TLS</span>
+                        {% else %}
+                        <span style="color:#cbd5e1;font-size:16px;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('http.edit_router', name=r.name) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="POST" action="{{ url_for('http.delete_router', name=r.name) }}"
+                              onsubmit="return confirm('Delete router {{ r.name }}?');" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="p-3 border-top" style="font-size:12px;color:#94a3b8;">
+        {{ recent_routers|length }} router(s) &nbsp;·&nbsp;
+        <a href="{{ url_for('http.list_routers') }}" class="text-primary">View all →</a>
+    </div>
+    {% else %}
+    {{ empty_state('bi-signpost', 'No routers yet', 'Use the sidebar to create your first service, then a router.', url_for('http.create_router'), 'Create Router') }}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}TCP Middlewares — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">TCP</li><li class="breadcrumb-item active">Middlewares</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('TCP Middlewares', 'Connection limiting and IP filtering for TCP traffic', url_for('tcp.create_tcp_middleware'), 'Create TCP Middleware') }}
+
+{% if middlewares %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:40px;">#</th>
+                <th>Name</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mw in middlewares %}
+            <tr>
+                <td class="tbl-muted">{{ loop.index }}</td>
+                <td><span class="tbl-name">{{ mw }}</span></td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('tcp.edit_tcp_middleware', name=mw) }}" class="btn btn-sm btn-outline-secondary" title="Edit middleware"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('tcp.delete_tcp_middleware', name=mw), mw, 'middleware') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ middlewares|length }} TCP middleware(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-shield-check', 'No TCP middlewares yet', 'TCP middlewares support inFlightConn (connection limiting) and ipAllowList (IP filtering).', url_for('tcp.create_tcp_middleware'), 'Create TCP Middleware') }}
+{% endif %}
+{% endblock %}

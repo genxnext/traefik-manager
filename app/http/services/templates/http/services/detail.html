@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ service_name }} — Service Detail — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item"><a href="{{ url_for('http.list_services') }}">Services</a></li><li class="breadcrumb-item active">{{ service_name }}</li>{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ service_name }}</h1>
+        <p>Service detail — parsed configuration and raw etcd keys</p>
+    </div>
+    <a href="{{ url_for('http.list_services') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Services
+    </a>
+</div>
+
+<div class="data-table mb-4">
+    <div class="px-3 pt-3 pb-1">
+        <p class="form-section-title mb-2">Primary URL</p>
+        {% if parsed_primary_url %}
+        <code class="rule-code d-inline-block mb-3">{{ parsed_primary_url }}</code>
+        {% else %}
+        <p class="tbl-muted mb-3">No primary URL found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="data-table">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>etcd Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if raw_kvs %}
+            {% for key, value in raw_kvs %}
+            <tr>
+                <td><code class="tbl-muted">{{ key }}</code></td>
+                <td><code>{{ value }}</code></td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr><td colspan="2" class="tbl-muted text-center py-3">No keys found for this service.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% if raw_kvs %}<div class="table-footer-count">{{ raw_kvs|length }} key(s)</div>{% endif %}
+</div>
+{% endblock %}

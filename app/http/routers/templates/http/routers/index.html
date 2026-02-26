@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}HTTP Routers — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item active">Routers</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('HTTP Routers', 'Route incoming requests to backend services based on rules and entrypoints', url_for('http.create_router'), 'Create Router') }}
+
+{% if routers %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Rule</th>
+                <th>Service</th>
+                <th>Entrypoints</th>
+                <th>TLS</th>
+                <th>Middlewares</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for router in routers %}
+            <tr>
+                <td><span class="tbl-name">{{ router.name }}</span></td>
+                <td><span class="rule-code" title="{{ router.rule }}">{{ router.rule }}</span></td>
+                <td><span class="tbl-muted">{{ router.service }}</span></td>
+                <td>
+                    {% for ep in router.entrypoints %}
+                    <span class="badge badge-http me-1">{{ ep }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% if router.tls %}
+                    <span class="badge badge-tls"><i class="bi bi-lock-fill me-1"></i>TLS</span>
+                    {% if router.tls is mapping %}
+                        {% set res = router.tls.get('cert_resolver') or router.tls.get('certresolver') or router.tls.get('certResolver') %}
+                    {% else %}
+                        {% set res = router.tls.cert_resolver %}
+                    {% endif %}
+                    {% if res %}<div class="tbl-muted mt-1">{{ res }}</div>{% endif %}
+                    {% else %}
+                    <span class="tbl-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if router.middlewares %}
+                        {% for mw in router.middlewares %}
+                        <span class="badge badge-neutral me-1">{{ mw }}</span>
+                        {% endfor %}
+                    {% else %}
+                    <span class="tbl-muted">—</span>
+                    {% endif %}
+                </td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('http.edit_router', name=router.name) }}" class="btn btn-sm btn-outline-secondary" title="Edit router"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('http.delete_router', name=router.name), router.name, 'router') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ routers|length }} router(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-signpost-2', 'No HTTP routers yet', 'Create a router to start routing traffic to your backend services using Host rules and TLS.', url_for('http.create_router'), 'Create Router') }}
+{% endif %}
+{% endblock %}

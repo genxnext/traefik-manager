@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Edit TLS Store — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">TLS</li><li class="breadcrumb-item active">Edit TLS Store: {{ store_name }}</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Edit TLS Store: ' ~ store_name, url_for('tls.list_tls_stores'), 'Back to TLS Stores') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('tls.edit_tls_store', name=store_name) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Store Name</label>
+                        <input type="text" class="form-control" value="{{ store_name }}" disabled>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Default Certificate</h6>
+                            <div class="mb-3">
+                                <label for="cert_file" class="form-label">Certificate File</label>
+                                <input type="text" class="form-control" id="cert_file" name="cert_file"
+                                       value="{{ form_data.get('cert_file', '') }}"
+                                       placeholder="/path/to/cert.pem">
+                            </div>
+                            <div class="mb-3">
+                                <label for="key_file" class="form-label">Key File</label>
+                                <input type="text" class="form-control" id="key_file" name="key_file"
+                                       value="{{ form_data.get('key_file', '') }}"
+                                       placeholder="/path/to/key.pem">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Default Generated Certificate (ACME)</h6>
+                            <div class="mb-3">
+                                <label for="gen_resolver" class="form-label">Resolver Name</label>
+                                <input type="text" class="form-control" id="gen_resolver" name="gen_resolver"
+                                       value="{{ form_data.get('gen_resolver', '') }}"
+                                       placeholder="myresolver">
+                                <div class="form-text">The ACME resolver to use for generating certificates</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="gen_domain_main" class="form-label">Main Domain</label>
+                                <input type="text" class="form-control" id="gen_domain_main" name="gen_domain_main"
+                                       value="{{ form_data.get('gen_domain_main', '') }}"
+                                       placeholder="example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="gen_domain_sans" class="form-label">Subject Alternative Names (SANs)</label>
+                                <input type="text" class="form-control" id="gen_domain_sans" name="gen_domain_sans"
+                                       value="{{ form_data.get('gen_domain_sans', '') }}"
+                                       placeholder="www.example.com, api.example.com">
+                                <div class="form-text">Comma-separated additional domain names</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_footer(url_for('tls.list_tls_stores'), 'Update TLS Store') }}
+                </form>
+{% endblock %}

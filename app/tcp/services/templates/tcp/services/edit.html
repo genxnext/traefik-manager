@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Edit TCP Service — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">TCP</li><li class="breadcrumb-item active">Edit TCP Service: {{ service_name }}</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Edit TCP Service: ' ~ service_name, url_for('tcp.list_tcp_services'), 'Back to TCP Services') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('tcp.edit_tcp_service', name=service_name) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Service Name</label>
+                        <input type="text" class="form-control" value="{{ service_name }}" disabled>
+                        <div class="form-text">Service name cannot be changed.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addresses" class="form-label">Server Addresses <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="addresses" name="addresses"
+                               value="{{ form_data.get('addresses', '') }}"
+                               placeholder="192.168.1.10:9000, 192.168.1.11:9000" required>
+                        <div class="form-text">Comma-separated host:port addresses</div>
+                    </div>
+
+                    {{ form_footer(url_for('tcp.list_tcp_services'), 'Update TCP Service') }}
+                </form>
+{% endblock %}

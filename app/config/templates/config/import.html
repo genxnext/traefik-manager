@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import form_footer %}
+
+{% block title %}Import Configuration — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">Config</li>
+<li class="breadcrumb-item active">Import</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Import Configuration</h1>
+        <p>Restore from a full backup, or import individual routers and services</p>
+    </div>
+    <a href="{{ url_for('config.export_config') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-download me-1"></i>Export
+    </a>
+</div>
+
+<div class="data-table" style="max-width:820px;">
+
+    <!-- Tab navigation -->
+    <div style="border-bottom:1px solid var(--border-color, #e2e8f0); padding:0 20px;">
+        <ul class="nav nav-tabs border-0" id="importTypeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="routers-tab" data-bs-toggle="tab"
+                        data-bs-target="#routers-pane" type="button" role="tab">
+                    <i class="bi bi-diagram-2 me-1"></i>HTTP Routers
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="services-tab" data-bs-toggle="tab"
+                        data-bs-target="#services-pane" type="button" role="tab">
+                    <i class="bi bi-hdd-stack me-1"></i>HTTP Services
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="backup-tab" data-bs-toggle="tab"
+                        data-bs-target="#backup-pane" type="button" role="tab">
+                    <i class="bi bi-archive me-1"></i>Full Backup
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab content -->
+    <div class="tab-content p-4" id="importTypeContent">
+
+        <!-- ── Routers pane ── -->
+        <div class="tab-pane fade show active" id="routers-pane" role="tabpanel">
+            <p class="text-muted mb-3">
+                Paste JSON containing HTTP routers. Accepts
+                <code>{"http": {"routers": [...]}}</code>,
+                <code>{"routers": [...]}</code>, or a plain array.
+            </p>
+            <form method="POST">
+                <input type="hidden" name="import_type" value="routers">
+                <div class="mb-3">
+                    <label for="config_json_routers" class="form-label">Configuration JSON</label>
+                    <textarea
+                        class="form-control font-monospace"
+                        id="config_json_routers"
+                        name="config_json"
+                        rows="14"
+                        placeholder='{"http": {"routers": [{"name": "my-router", "rule": "Host(`example.com`)", "service": "my-service", "entrypoints": ["web"]}]}}'
+                        required
+                    >{{ form_data.get('config_json', '') if form_data.get('import_type', 'routers') == 'routers' else '' }}</textarea>
+                </div>
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="merge_routers" name="merge"
+                           {% if form_data.get('merge', 'on') == 'on' %}checked{% endif %}>
+                    <label class="form-check-label" for="merge_routers">
+                        Merge with existing routers (uncheck to replace all)
+                    </label>
+                </div>
+                {{ form_footer(url_for('common.index'), 'Import Routers') }}
+            </form>
+
+            <!-- Format hint -->
+            <div class="mt-4 p-3 rounded" style="background:var(--bg-alt,#f8fafc); border:1px solid var(--border-color,#e2e8f0);">
+                <p class="mb-1" style="font-size:.8rem; font-weight:600; color:var(--text-muted,#64748b);">EXPECTED FORMAT</p>
+                <pre class="mb-0 small" style="color:var(--text-muted,#64748b);">{"http": {"routers": [
+  {
+    "name": "my-router",
+    "rule": "Host(`example.com`)",
+    "service": "my-service",
+    "entrypoints": ["web"],
+    "middlewares": []
+  }
+]}}</pre>
+            </div>
+        </div>
+
+        <!-- ── Services pane ── -->
+        <div class="tab-pane fade" id="services-pane" role="tabpanel">
+            <p class="text-muted mb-3">
+                Paste a JSON array of services with <code>name</code> and <code>url</code> fields
+                to bulk-create HTTP services.
+            </p>
+            <form method="POST">
+                <input type="hidden" name="import_type" value="services">
+                <div class="mb-3">
+                    <label for="config_json_services" class="form-label">Services JSON</label>
+                    <textarea
+                        class="form-control font-monospace"
+                        id="config_json_services"
+                        name="config_json"
+                        rows="14"
+                        placeholder='[{"name": "my-service", "url": "http://10.0.0.1:8080"}, {"name": "api-service", "url": "http://10.0.0.2:9000"}]'
+                        required
+                    >{{ form_data.get('config_json', '') if form_data.get('import_type') == 'services' else '' }}</textarea>
+                </div>
+                {{ form_footer(url_for('common.index'), 'Import Services') }}
+            </form>
+
+            <!-- Format hint -->
+            <div class="mt-4 p-3 rounded" style="background:var(--bg-alt,#f8fafc); border:1px solid var(--border-color,#e2e8f0);">
+                <p class="mb-1" style="font-size:.8rem; font-weight:600; color:var(--text-muted,#64748b);">EXPECTED FORMAT</p>
+                <pre class="mb-0 small" style="color:var(--text-muted,#64748b);">[
+  {"name": "my-service",  "url": "http://10.0.0.1:8080"},
+  {"name": "api-service", "url": "https://api.internal:9000"}
+]</pre>
+            </div>
+        </div>
+
+        <!-- ── Full Backup pane ── -->
+        <div class="tab-pane fade" id="backup-pane" role="tabpanel">
+            <p class="text-muted mb-3">
+                Upload a <strong>Full Backup</strong> file (.json) previously downloaded from
+                <a href="{{ url_for('config.export_config') }}">Export</a>.
+                This restores all etcd key-value pairs and, optionally, connection profiles.
+            </p>
+
+            <!-- Warning banner -->
+            <div class="alert alert-warning d-flex gap-2 align-items-start mb-4" role="alert" style="font-size:.875rem;">
+                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+                <div>
+                    <strong>This will overwrite existing etcd keys.</strong>
+                    All Traefik routes, services, middlewares and TLS settings stored in etcd
+                    will be replaced with the values from the backup file.
+                    This action cannot be undone.
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('config.import_full_backup') }}" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="backup_file" class="form-label">Backup File (.json) *</label>
+                    <input type="file" class="form-control" id="backup_file"
+                           name="backup_file" accept=".json" required>
+                    <div class="form-text">
+                        Select a <code>.json</code> file exported via Export → Full Backup.
+                    </div>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="import_connections"
+                           name="import_connections" checked>
+                    <label class="form-check-label" for="import_connections">
+                        Also restore etcd connection profiles
+                        <span class="text-muted">(existing profiles with the same URL are skipped)</span>
+                    </label>
+                </div>
+
+                {{ form_footer(url_for('config.export_config'), 'Restore Backup') }}
+            </form>
+
+            <!-- Format hint -->
+            <div class="mt-4 p-3 rounded" style="background:var(--bg-alt,#f8fafc); border:1px solid var(--border-color,#e2e8f0);">
+                <p class="mb-1" style="font-size:.8rem; font-weight:600; color:var(--text-muted,#64748b);">BACKUP FILE STRUCTURE</p>
+                <pre class="mb-0 small" style="color:var(--text-muted,#64748b);">{
+  "version": "1.0",
+  "exported_at": "2025-01-15T10:30:00Z",
+  "etcd_prefix": "/traefik/",
+  "etcd_kvs": {
+    "/traefik/http/routers/my-router/rule": "Host(`example.com`)",
+    ...
+  },
+  "connections": [
+    {"name": "prod", "url": "http://etcd:2379", "description": "..."}
+  ]
+}</pre>
+            </div>
+        </div>
+
+    </div><!-- /tab-content -->
+</div><!-- /data-table -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Re-activate the correct tab after a form submission
+    var importType = '{{ form_data.get("import_type", "routers") if form_data else "routers" }}';
+    var tabId = importType === 'services' ? 'services-tab' : 'routers-tab';
+    var tabEl = document.getElementById(tabId);
+    if (tabEl) { new bootstrap.Tab(tabEl).show(); }
+
+    // If redirected back to backup tab via query string
+    if (window.location.hash === '#backup') {
+        var bt = document.getElementById('backup-tab');
+        if (bt) { new bootstrap.Tab(bt).show(); }
+    }
+});
+</script>
+{% endblock %}

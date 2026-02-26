@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Create Service — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item active">Create New Service</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Create New Service', url_for('http.list_services'), 'Back to Services') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('http.create_service') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Service Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ form_data.get('name', '') }}"
+                               placeholder="my-service" required
+                               pattern="[a-zA-Z0-9_\-]+"
+                               title="Only alphanumeric, hyphens, and underscores allowed">
+                        <div class="form-text">Only letters, numbers, hyphens, and underscores</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="url" class="form-label">Backend URL <span class="text-danger">*</span></label>
+                        <input type="url" class="form-control" id="url" name="url"
+                               value="{{ form_data.get('url', '') }}"
+                               placeholder="http://127.0.0.1:8080" required>
+                        <div class="form-text">Single backend server URL (e.g., http://127.0.0.1:8080)</div>
+                    </div>
+
+                    {{ form_footer(url_for('http.list_services'), 'Create Service') }}
+                </form>
+{% endblock %}

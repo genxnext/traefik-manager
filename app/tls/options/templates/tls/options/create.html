@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Create TLS Options — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">TLS</li><li class="breadcrumb-item active">Create TLS Options</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Create TLS Options', url_for('tls.list_tls_options'), 'Back to TLS Options') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('tls.create_tls_options') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Options Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ form_data.get('name', '') if form_data else '' }}"
+                               placeholder="my-tls-opts" required
+                               pattern="[a-zA-Z0-9_\-]+"
+                               title="Only alphanumeric, hyphens, and underscores allowed">
+                        <div class="form-text">Use "default" to set the default TLS options for all routers</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="min_version" class="form-label">Minimum TLS Version</label>
+                            <select class="form-select" id="min_version" name="min_version">
+                                <option value="" {% if not form_data or not form_data.get('min_version') %}selected{% endif %}>-- Not set --</option>
+                                <option value="VersionTLS10" {% if form_data and form_data.get('min_version') == 'VersionTLS10' %}selected{% endif %}>TLS 1.0</option>
+                                <option value="VersionTLS11" {% if form_data and form_data.get('min_version') == 'VersionTLS11' %}selected{% endif %}>TLS 1.1</option>
+                                <option value="VersionTLS12" {% if form_data and form_data.get('min_version') == 'VersionTLS12' %}selected{% endif %}>TLS 1.2</option>
+                                <option value="VersionTLS13" {% if form_data and form_data.get('min_version') == 'VersionTLS13' %}selected{% endif %}>TLS 1.3</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="max_version" class="form-label">Maximum TLS Version</label>
+                            <select class="form-select" id="max_version" name="max_version">
+                                <option value="" {% if not form_data or not form_data.get('max_version') %}selected{% endif %}>-- Not set --</option>
+                                <option value="VersionTLS10" {% if form_data and form_data.get('max_version') == 'VersionTLS10' %}selected{% endif %}>TLS 1.0</option>
+                                <option value="VersionTLS11" {% if form_data and form_data.get('max_version') == 'VersionTLS11' %}selected{% endif %}>TLS 1.1</option>
+                                <option value="VersionTLS12" {% if form_data and form_data.get('max_version') == 'VersionTLS12' %}selected{% endif %}>TLS 1.2</option>
+                                <option value="VersionTLS13" {% if form_data and form_data.get('max_version') == 'VersionTLS13' %}selected{% endif %}>TLS 1.3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cipher_suites" class="form-label">Cipher Suites</label>
+                        <textarea class="form-control" id="cipher_suites" name="cipher_suites" rows="3"
+                                  placeholder="TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384">{{ form_data.get('cipher_suites', '') if form_data else '' }}</textarea>
+                        <div class="form-text">Comma-separated list. Leave empty for defaults.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="curve_preferences" class="form-label">Curve Preferences</label>
+                        <input type="text" class="form-control" id="curve_preferences" name="curve_preferences"
+                               value="{{ form_data.get('curve_preferences', '') if form_data else '' }}"
+                               placeholder="X25519, CurveP256, CurveP384">
+                        <div class="form-text">Comma-separated elliptic curves</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="sni_strict" id="sni_strict"
+                                   {% if form_data and form_data.get('sni_strict') == 'on' %}checked{% endif %}>
+                            <label class="form-check-label" for="sni_strict">
+                                <strong>SNI Strict</strong> — Reject connections without matching SNI
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="alpn_protocols" class="form-label">ALPN Protocols</label>
+                        <input type="text" class="form-control" id="alpn_protocols" name="alpn_protocols"
+                               value="{{ form_data.get('alpn_protocols', '') if form_data else '' }}"
+                               placeholder="h2, http/1.1, acme-tls/1">
+                        <div class="form-text">Comma-separated ALPN protocols</div>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Client Authentication (mTLS)</h6>
+                            <div class="mb-3">
+                                <label for="client_auth_type" class="form-label">Client Auth Type</label>
+                                <select class="form-select" id="client_auth_type" name="client_auth_type">
+                                    <option value="" {% if not form_data or not form_data.get('client_auth_type') %}selected{% endif %}>-- None --</option>
+                                    <option value="NoClientCert" {% if form_data and form_data.get('client_auth_type') == 'NoClientCert' %}selected{% endif %}>NoClientCert</option>
+                                    <option value="RequestClientCert" {% if form_data and form_data.get('client_auth_type') == 'RequestClientCert' %}selected{% endif %}>RequestClientCert</option>
+                                    <option value="RequireAnyClientCert" {% if form_data and form_data.get('client_auth_type') == 'RequireAnyClientCert' %}selected{% endif %}>RequireAnyClientCert</option>
+                                    <option value="VerifyClientCertIfGiven" {% if form_data and form_data.get('client_auth_type') == 'VerifyClientCertIfGiven' %}selected{% endif %}>VerifyClientCertIfGiven</option>
+                                    <option value="RequireAndVerifyClientCert" {% if form_data and form_data.get('client_auth_type') == 'RequireAndVerifyClientCert' %}selected{% endif %}>RequireAndVerifyClientCert</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="client_auth_ca_files" class="form-label">Client CA Files</label>
+                                <input type="text" class="form-control" id="client_auth_ca_files" name="client_auth_ca_files"
+                                       value="{{ form_data.get('client_auth_ca_files', '') if form_data else '' }}"
+                                       placeholder="/path/to/ca1.pem, /path/to/ca2.pem">
+                                <div class="form-text">Comma-separated paths to CA certificate files</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_footer(url_for('tls.list_tls_options'), 'Create TLS Options') }}
+                </form>
+{% endblock %}

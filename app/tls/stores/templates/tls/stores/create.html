@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Create TLS Store — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">TLS</li><li class="breadcrumb-item active">Create TLS Store</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Create TLS Store', url_for('tls.list_tls_stores'), 'Back to TLS Stores') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('tls.create_tls_store') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Store Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ form_data.get('name', '') if form_data else '' }}"
+                               placeholder="default" required
+                               pattern="[a-zA-Z0-9_\-]+"
+                               title="Only alphanumeric, hyphens, and underscores allowed">
+                        <div class="form-text">Use "default" for the default TLS store</div>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Default Certificate</h6>
+                            <div class="mb-3">
+                                <label for="cert_file" class="form-label">Certificate File Path</label>
+                                <input type="text" class="form-control" id="cert_file" name="cert_file"
+                                       value="{{ form_data.get('cert_file', '') if form_data else '' }}"
+                                       placeholder="/path/to/cert.pem">
+                            </div>
+                            <div class="mb-3">
+                                <label for="key_file" class="form-label">Key File Path</label>
+                                <input type="text" class="form-control" id="key_file" name="key_file"
+                                       value="{{ form_data.get('key_file', '') if form_data else '' }}"
+                                       placeholder="/path/to/key.pem">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Generated Certificate (ACME)</h6>
+                            <div class="mb-3">
+                                <label for="gen_resolver" class="form-label">Certificate Resolver</label>
+                                <input type="text" class="form-control" id="gen_resolver" name="gen_resolver"
+                                       value="{{ form_data.get('gen_resolver', '') if form_data else '' }}"
+                                       placeholder="letsencrypt">
+                            </div>
+                            <div class="mb-3">
+                                <label for="gen_domain_main" class="form-label">Main Domain</label>
+                                <input type="text" class="form-control" id="gen_domain_main" name="gen_domain_main"
+                                       value="{{ form_data.get('gen_domain_main', '') if form_data else '' }}"
+                                       placeholder="example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="gen_domain_sans" class="form-label">SANs (Subject Alternative Names)</label>
+                                <input type="text" class="form-control" id="gen_domain_sans" name="gen_domain_sans"
+                                       value="{{ form_data.get('gen_domain_sans', '') if form_data else '' }}"
+                                       placeholder="*.example.com, sub.example.com">
+                                <div class="form-text">Comma-separated alternative domain names</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_footer(url_for('tls.list_tls_stores'), 'Create TLS Store') }}
+                </form>
+{% endblock %}

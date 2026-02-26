@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Edit Servers Transport — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item active">Edit Servers Transport: {{ transport_name }}</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Edit Servers Transport: ' ~ transport_name, url_for('http.list_servers_transports'), 'Back to Servers Transports') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('http.edit_servers_transport', name=transport_name) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Transport Name</label>
+                        <input type="text" class="form-control" value="{{ transport_name }}" disabled>
+                        <div class="form-text">Transport name cannot be changed.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="server_name" class="form-label">Server Name (SNI)</label>
+                        <input type="text" class="form-control" id="server_name" name="server_name"
+                               value="{{ form_data.get('server_name', '') }}"
+                               placeholder="backend.example.com">
+                        <div class="form-text">Server name used for SNI verification</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="insecure_skip_verify"
+                                   id="insecure_skip_verify"
+                                   {% if form_data.get('insecure_skip_verify') %}checked{% endif %}>
+                            <label class="form-check-label" for="insecure_skip_verify">
+                                <strong>Insecure Skip Verify</strong> — Skip TLS certificate verification
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="root_cas" class="form-label">Root CA Certificates</label>
+                        <input type="text" class="form-control" id="root_cas" name="root_cas"
+                               value="{{ form_data.get('root_cas', '') }}"
+                               placeholder="/path/to/ca1.pem, /path/to/ca2.pem">
+                        <div class="form-text">Comma-separated paths to root CA certificate files</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="max_idle_conns" class="form-label">Max Idle Connections Per Host</label>
+                        <input type="number" class="form-control" id="max_idle_conns" name="max_idle_conns"
+                               value="{{ form_data.get('max_idle_conns', 0) }}"
+                               placeholder="0" min="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="disable_http2"
+                                   id="disable_http2"
+                                   {% if form_data.get('disable_http2') %}checked{% endif %}>
+                            <label class="form-check-label" for="disable_http2">
+                                <strong>Disable HTTP/2</strong> — Force HTTP/1.1 to backends
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="peer_cert_uri" class="form-label">Peer Cert URI (SPIFFE)</label>
+                        <input type="text" class="form-control" id="peer_cert_uri" name="peer_cert_uri"
+                               value="{{ form_data.get('peer_cert_uri', '') }}"
+                               placeholder="spiffe://trust-domain/workload">
+                    </div>
+
+                    {{ form_footer(url_for('http.list_servers_transports'), 'Update Servers Transport') }}
+                </form>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Create TCP Middleware — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">TCP</li><li class="breadcrumb-item active">Create TCP Middleware</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Create TCP Middleware', url_for('tcp.list_tcp_middlewares'), 'Back to TCP Middlewares') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('tcp.create_tcp_middleware') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Middleware Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ form_data.get('name', '') if form_data else '' }}"
+                               placeholder="my-tcp-mw" required
+                               pattern="[a-zA-Z0-9_\-]+"
+                               title="Only alphanumeric, hyphens, and underscores allowed">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Middleware Type <span class="text-danger">*</span></label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="middleware_type"
+                                   value="inFlightConn" id="type-inflightconn"
+                                   {% if form_data and form_data.get('middleware_type') == 'inFlightConn' %}checked{% endif %}>
+                            <label class="form-check-label" for="type-inflightconn">
+                                <strong>InFlightConn</strong> — Limit concurrent connections
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="middleware_type"
+                                   value="ipAllowList" id="type-ipallowlist"
+                                   {% if form_data and form_data.get('middleware_type') == 'ipAllowList' %}checked{% endif %}>
+                            <label class="form-check-label" for="type-ipallowlist">
+                                <strong>IPAllowList</strong> — Allow only specific IPs
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- InFlightConn options -->
+                    <div id="inflightconn-options" class="mb-3" style="display:none;">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>InFlightConn Settings</h6>
+                                <label for="amount" class="form-label">Max Concurrent Connections</label>
+                                <input type="number" class="form-control" id="amount" name="amount"
+                                       value="{{ form_data.get('amount', '10') if form_data else '10' }}" min="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- IPAllowList options -->
+                    <div id="ipallowlist-options" class="mb-3" style="display:none;">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>IPAllowList Settings</h6>
+                                <label for="source_range" class="form-label">Allowed Source Ranges</label>
+                                <input type="text" class="form-control" id="source_range" name="source_range"
+                                       value="{{ form_data.get('source_range', '') if form_data else '' }}"
+                                       placeholder="10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16">
+                                <div class="form-text">Comma-separated CIDR ranges</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_footer(url_for('tcp.list_tcp_middlewares'), 'Create TCP Middleware') }}
+                </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateTypeOptions() {
+    var selected = document.querySelector('input[name="middleware_type"]:checked');
+    document.getElementById('inflightconn-options').style.display = 'none';
+    document.getElementById('ipallowlist-options').style.display = 'none';
+    if (selected) {
+        if (selected.value === 'inFlightConn') {
+            document.getElementById('inflightconn-options').style.display = 'block';
+        } else if (selected.value === 'ipAllowList') {
+            document.getElementById('ipallowlist-options').style.display = 'block';
+        }
+    }
+}
+document.querySelectorAll('input[name="middleware_type"]').forEach(function(el) {
+    el.addEventListener('change', updateTypeOptions);
+});
+updateTypeOptions();
+</script>
+{% endblock %}

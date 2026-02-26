@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}TLS Options — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">TLS</li><li class="breadcrumb-item active">Options</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('TLS Options', 'Define TLS protocol versions, cipher suites and client authentication settings', url_for('tls.create_tls_options'), 'Create TLS Options') }}
+
+{% if options_list %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Min Version</th>
+                <th>Max Version</th>
+                <th>SNI Strict</th>
+                <th>Cipher Suites</th>
+                <th>Client Auth</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for opt in options_list %}
+            <tr>
+                <td><span class="tbl-name">{{ opt.name }}</span></td>
+                <td><span class="rule-code">{{ opt.min_version or '—' }}</span></td>
+                <td><span class="rule-code">{{ opt.max_version or '—' }}</span></td>
+                <td>
+                    {% if opt.sni_strict %}
+                    <span class="badge badge-positive">Strict</span>
+                    {% else %}
+                    <span class="tbl-muted">Off</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if opt.cipher_suites %}
+                    <span class="badge badge-neutral">{{ opt.cipher_suites|length }} configured</span>
+                    {% else %}
+                    <span class="tbl-muted">Default</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if opt.client_auth_type %}
+                    <span class="badge badge-tls">{{ opt.client_auth_type }}</span>
+                    {% else %}
+                    <span class="tbl-muted">None</span>
+                    {% endif %}
+                </td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('tls.edit_tls_options', name=opt.name) }}" class="btn btn-sm btn-outline-secondary" title="Edit options"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('tls.delete_tls_options', name=opt.name), opt.name, 'TLS options') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ options_list|length }} TLS option set(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-lock', 'No TLS options yet', 'TLS options configure protocol versions, cipher suites, and client authentication requirements for your routers.', url_for('tls.create_tls_options'), 'Create TLS Options') }}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}HTTP Services — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item active">Services</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('HTTP Services', 'Backend server targets that handle requests forwarded by routers', url_for('http.create_service'), 'Create Service') }}
+
+{% if services %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:40px;">#</th>
+                <th>Name</th>
+                <th>Backend URL</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in services %}
+            <tr>
+                <td class="tbl-muted">{{ loop.index }}</td>
+                <td><span class="tbl-name">{{ service }}</span></td>
+                <td>
+                    {% if service_urls.get(service) %}
+                    <span class="rule-code" title="{{ service_urls[service] }}">{{ service_urls[service] }}</span>
+                    {% else %}
+                    <span class="tbl-muted">—</span>
+                    {% endif %}
+                </td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('http.service_detail', name=service) }}" class="btn btn-sm btn-outline-secondary" title="View details"><i class="bi bi-eye"></i></a>
+                        <a href="{{ url_for('http.edit_service', name=service) }}" class="btn btn-sm btn-outline-secondary" title="Edit service"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('http.delete_service', name=service), service, 'service') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ services|length }} service(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-hdd-network', 'No HTTP services yet', 'Create a service to define a backend URL that your routers can forward traffic to.', url_for('http.create_service'), 'Create Service') }}
+{% endif %}
+{% endblock %}

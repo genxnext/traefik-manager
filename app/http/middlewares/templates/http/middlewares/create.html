@@ -1,0 +1,573 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+{% block title %}Create Middleware — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item active">Create Middleware</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Create Middleware', url_for('http.list_middlewares'), 'Back', subtitle='Add a new HTTP middleware to your Traefik pipeline') }}
+
+<div class="form-card">
+<form method="POST" action="{{ url_for('http.create_middleware') }}">
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Middleware Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="name" name="name"
+               value="{{ form_data.get('name', '') }}"
+               placeholder="my-middleware" required
+               pattern="[a-zA-Z0-9_\-]+"
+               title="Letters, numbers, hyphens and underscores only">
+        <div class="form-text">Letters, numbers, hyphens and underscores only</div>
+    </div>
+
+    <div class="mb-4">
+        <label for="middleware_type" class="form-label">Middleware Type <span class="text-danger">*</span></label>
+        <select class="form-select" id="middleware_type" name="middleware_type" required onchange="showTypeSection(this.value)">
+            <option value="">— Select a type —</option>
+            <optgroup label="Path Manipulation">
+                <option value="addPrefix"        {% if form_data.get('middleware_type')=='addPrefix' %}selected{% endif %}>addPrefix — Prepend a path prefix</option>
+                <option value="stripPrefix"      {% if form_data.get('middleware_type')=='stripPrefix' %}selected{% endif %}>stripPrefix — Remove path prefixes</option>
+                <option value="stripPrefixRegex" {% if form_data.get('middleware_type')=='stripPrefixRegex' %}selected{% endif %}>stripPrefixRegex — Remove prefix by regex</option>
+                <option value="replacePath"      {% if form_data.get('middleware_type')=='replacePath' %}selected{% endif %}>replacePath — Replace entire path</option>
+                <option value="replacePathRegex" {% if form_data.get('middleware_type')=='replacePathRegex' %}selected{% endif %}>replacePathRegex — Replace path via regex</option>
+            </optgroup>
+            <optgroup label="Redirects">
+                <option value="redirectScheme" {% if form_data.get('middleware_type')=='redirectScheme' %}selected{% endif %}>redirectScheme — Redirect HTTP → HTTPS</option>
+                <option value="redirectRegex"  {% if form_data.get('middleware_type')=='redirectRegex' %}selected{% endif %}>redirectRegex — Redirect with regex</option>
+            </optgroup>
+            <optgroup label="Authentication">
+                <option value="basicAuth"   {% if form_data.get('middleware_type')=='basicAuth' %}selected{% endif %}>basicAuth — HTTP Basic auth</option>
+                <option value="digestAuth"  {% if form_data.get('middleware_type')=='digestAuth' %}selected{% endif %}>digestAuth — HTTP Digest auth</option>
+                <option value="forwardAuth" {% if form_data.get('middleware_type')=='forwardAuth' %}selected{% endif %}>forwardAuth — External auth service</option>
+            </optgroup>
+            <optgroup label="Traffic Control">
+                <option value="rateLimit"      {% if form_data.get('middleware_type')=='rateLimit' %}selected{% endif %}>rateLimit — Limit requests per period</option>
+                <option value="inFlightReq"    {% if form_data.get('middleware_type')=='inFlightReq' %}selected{% endif %}>inFlightReq — Limit concurrent requests</option>
+                <option value="circuitBreaker" {% if form_data.get('middleware_type')=='circuitBreaker' %}selected{% endif %}>circuitBreaker — Open on error threshold</option>
+                <option value="retry"          {% if form_data.get('middleware_type')=='retry' %}selected{% endif %}>retry — Retry failed requests</option>
+                <option value="buffering"      {% if form_data.get('middleware_type')=='buffering' %}selected{% endif %}>buffering — Buffer request/response bodies</option>
+            </optgroup>
+            <optgroup label="Headers &amp; Response">
+                <option value="headers"      {% if form_data.get('middleware_type')=='headers' %}selected{% endif %}>headers — Security &amp; CORS headers</option>
+                <option value="compress"     {% if form_data.get('middleware_type')=='compress' %}selected{% endif %}>compress — Gzip/Brotli compression</option>
+                <option value="contentType"  {% if form_data.get('middleware_type')=='contentType' %}selected{% endif %}>contentType — Auto-detect Content-Type</option>
+            </optgroup>
+            <optgroup label="Access Control">
+                <option value="ipWhiteList" {% if form_data.get('middleware_type')=='ipWhiteList' %}selected{% endif %}>ipWhiteList — Allow-list by IP/CIDR</option>
+                <option value="chain"       {% if form_data.get('middleware_type')=='chain' %}selected{% endif %}>chain — Compose multiple middlewares</option>
+            </optgroup>
+            <optgroup label="Advanced / Specialised">
+                <option value="grpcWeb"           {% if form_data.get('middleware_type')=='grpcWeb' %}selected{% endif %}>grpcWeb — gRPC-Web protocol bridge</option>
+                <option value="passTLSClientCert" {% if form_data.get('middleware_type')=='passTLSClientCert' %}selected{% endif %}>passTLSClientCert — Forward TLS client cert</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <!-- ══ addPrefix ══════════════════════════════════ -->
+    <div id="type-addPrefix" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Prefix <span class="text-danger">*</span></label>
+            <input type="text" class="form-control font-monospace" name="prefix"
+                   value="{{ form_data.get('prefix','') }}" placeholder="/api">
+            <div class="form-text">Path prefix to prepend before forwarding the request</div>
+        </div>
+    </div>
+
+    <!-- ══ stripPrefix ════════════════════════════════ -->
+    <div id="type-stripPrefix" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Prefixes <span class="text-danger">*</span></label>
+            <input type="text" class="form-control font-monospace" name="prefixes"
+                   value="{{ form_data.get('prefixes','') }}" placeholder="/api, /v1">
+            <div class="form-text">Comma-separated prefixes to strip from the request path</div>
+        </div>
+    </div>
+
+    <!-- ══ stripPrefixRegex ═══════════════════════════ -->
+    <div id="type-stripPrefixRegex" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Regex patterns <span class="text-danger">*</span></label>
+            <input type="text" class="form-control font-monospace" name="spr_regex"
+                   value="{{ form_data.get('spr_regex','') }}" placeholder="/api/[0-9]+">
+            <div class="form-text">Comma-separated regular expressions matching the prefixes to strip</div>
+        </div>
+    </div>
+
+    <!-- ══ replacePath ════════════════════════════════ -->
+    <div id="type-replacePath" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">New Path <span class="text-danger">*</span></label>
+            <input type="text" class="form-control font-monospace" name="rp_path"
+                   value="{{ form_data.get('rp_path','') }}" placeholder="/new-path">
+            <div class="form-text">The path that will replace the original request path entirely</div>
+        </div>
+    </div>
+
+    <!-- ══ replacePathRegex ═══════════════════════════ -->
+    <div id="type-replacePathRegex" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Regex <span class="text-danger">*</span></label>
+            <input type="text" class="form-control font-monospace" name="rpr_regex"
+                   value="{{ form_data.get('rpr_regex','') }}" placeholder="^/api/(.*)$">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Replacement</label>
+            <input type="text" class="form-control font-monospace" name="rpr_replacement"
+                   value="{{ form_data.get('rpr_replacement','') }}" placeholder="/v2/$1">
+            <div class="form-text">Use <code>$1</code>, <code>$2</code>… for capture groups</div>
+        </div>
+    </div>
+
+    <!-- ══ redirectScheme ════════════════════════════= -->
+    <div id="type-redirectScheme" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Target Scheme <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="scheme"
+                   value="{{ form_data.get('scheme','https') }}" placeholder="https">
+        </div>
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="permanent" name="permanent"
+                       {% if form_data.get('permanent', True) %}checked{% endif %}>
+                <label class="form-check-label" for="permanent">Permanent redirect (301 instead of 302)</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ redirectRegex ══════════════════════════════ -->
+    <div id="type-redirectRegex" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Regex <span class="text-danger">*</span></label>
+            <input type="text" class="form-control font-monospace" name="rr_regex"
+                   value="{{ form_data.get('rr_regex','') }}" placeholder="^http://(.*)$">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Replacement</label>
+            <input type="text" class="form-control font-monospace" name="rr_replacement"
+                   value="{{ form_data.get('rr_replacement','') }}" placeholder="https://$1">
+            <div class="form-text">Use <code>$1</code> for captured groups. Include the full URL.</div>
+        </div>
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rr_permanent" name="rr_permanent"
+                       {% if form_data.get('rr_permanent') %}checked{% endif %}>
+                <label class="form-check-label" for="rr_permanent">Permanent redirect (301)</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ basicAuth ══════════════════════════════════ -->
+    <div id="type-basicAuth" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Users <span class="text-danger">*</span></label>
+            <textarea class="form-control font-monospace" name="users" rows="3"
+                      placeholder="user:$apr1$..., admin:$apr1$...">{{ form_data.get('users','') }}</textarea>
+            <div class="form-text">
+                Comma-separated <code>user:bcrypt-or-apr1-hash</code> pairs.
+                Generate with: <code>htpasswd -nb username password</code>
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Realm</label>
+                <input type="text" class="form-control" name="realm"
+                       value="{{ form_data.get('realm','Restricted') }}" placeholder="Restricted">
+            </div>
+            <div class="col-md-6 d-flex align-items-end pb-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="remove_header" name="remove_header"
+                           {% if form_data.get('remove_header') %}checked{% endif %}>
+                    <label class="form-check-label" for="remove_header">Remove <code>Authorization</code> header before forwarding</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ digestAuth ═════════════════════════════════ -->
+    <div id="type-digestAuth" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Users <span class="text-danger">*</span></label>
+            <textarea class="form-control font-monospace" name="dauth_users" rows="3"
+                      placeholder="user:realm:hash, admin:realm:hash">{{ form_data.get('dauth_users','') }}</textarea>
+            <div class="form-text">Comma-separated <code>user:realm:MD5-hash</code> entries</div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Realm</label>
+                <input type="text" class="form-control" name="dauth_realm"
+                       value="{{ form_data.get('dauth_realm','Restricted') }}" placeholder="Restricted">
+            </div>
+            <div class="col-md-6 d-flex align-items-end pb-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="dauth_remove_header" name="dauth_remove_header"
+                           {% if form_data.get('dauth_remove_header') %}checked{% endif %}>
+                    <label class="form-check-label" for="dauth_remove_header">Remove <code>Authorization</code> header before forwarding</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ forwardAuth ════════════════════════════════ -->
+    <div id="type-forwardAuth" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Auth Service URL <span class="text-danger">*</span></label>
+            <input type="url" class="form-control" name="fa_address"
+                   value="{{ form_data.get('fa_address','') }}" placeholder="http://auth-service:4181/">
+            <div class="form-text">The external authentication service that will verify requests</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Auth Response Headers to Forward</label>
+            <input type="text" class="form-control" name="fa_response_headers"
+                   value="{{ form_data.get('fa_response_headers','') }}"
+                   placeholder="X-Auth-User, X-Auth-Role">
+            <div class="form-text">Comma-separated headers from the auth response to copy to the upstream request</div>
+        </div>
+        <div class="mb-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="fa_trust_forward" name="fa_trust_forward"
+                       {% if form_data.get('fa_trust_forward') %}checked{% endif %}>
+                <label class="form-check-label" for="fa_trust_forward">Trust X-Forwarded-* headers</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="fa_tls_insecure" name="fa_tls_insecure"
+                       {% if form_data.get('fa_tls_insecure') %}checked{% endif %}>
+                <label class="form-check-label" for="fa_tls_insecure">Skip TLS verification</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ rateLimit ══════════════════════════════════ -->
+    <div id="type-rateLimit" class="type-section" style="display:none;">
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Average <span class="text-danger">*</span></label>
+                <input type="number" min="0" class="form-control" name="average"
+                       value="{{ form_data.get('average','100') }}" placeholder="100">
+                <div class="form-text">Requests per period</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Burst <span class="text-danger">*</span></label>
+                <input type="number" min="0" class="form-control" name="burst"
+                       value="{{ form_data.get('burst','50') }}" placeholder="50">
+                <div class="form-text">Allowed burst over average</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Period <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="period"
+                       value="{{ form_data.get('period','1s') }}" placeholder="1s">
+                <div class="form-text">Window: 1s, 1m, 1h…</div>
+            </div>
+        </div>
+        <p class="fw-semibold text-secondary mb-2">Source IP Strategy</p>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="use_ip_strategy" name="use_ip_strategy"
+                           {% if form_data.get('use_ip_strategy', True) %}checked{% endif %}>
+                    <label class="form-check-label" for="use_ip_strategy">Use IP strategy (X-Forwarded-For)</label>
+                </div>
+                <label class="form-label">IP Depth</label>
+                <input type="number" min="0" class="form-control" name="rl_ip_depth"
+                       value="{{ form_data.get('rl_ip_depth','0') }}" placeholder="0">
+                <div class="form-text">0 = real remote IP; N = N-th entry in X-Forwarded-For</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Excluded IPs (from limit)</label>
+                <input type="text" class="form-control font-monospace" name="rl_excluded_ips"
+                       value="{{ form_data.get('rl_excluded_ips','') }}" placeholder="10.0.0.1, 192.168.0.0/24">
+                <div class="form-text">Comma-separated IPs/CIDRs that bypass rate limiting</div>
+            </div>
+        </div>
+        <p class="fw-semibold text-secondary mb-2">Request Key Source</p>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="use_request_host" name="use_request_host"
+                           {% if form_data.get('use_request_host') %}checked{% endif %}>
+                    <label class="form-check-label" for="use_request_host">
+                        Use request Host header as rate-limit key
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Use request Header as key</label>
+                <input type="text" class="form-control" name="use_request_header"
+                       value="{{ form_data.get('use_request_header','') }}" placeholder="X-API-Key">
+                <div class="form-text">Name of the request header to use as the rate-limit bucket key (leave blank to use IP)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ inFlightReq ════════════════════════════════ -->
+    <div id="type-inFlightReq" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Max Concurrent Requests <span class="text-danger">*</span></label>
+            <input type="number" min="1" class="form-control" name="ifr_amount"
+                   value="{{ form_data.get('ifr_amount','10') }}" placeholder="10">
+            <div class="form-text">Maximum number of allowed simultaneous in-flight requests</div>
+        </div>
+    </div>
+
+    <!-- ══ circuitBreaker ════════════════════════════= -->
+    <div id="type-circuitBreaker" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Expression <span class="text-danger">*</span></label>
+            <input type="text" class="form-control font-monospace" name="cb_expression"
+                   value="{{ form_data.get('cb_expression','NetworkErrorRatio() > 0.30') }}"
+                   placeholder="NetworkErrorRatio() > 0.30">
+            <div class="form-text">
+                Condition to open the circuit. Functions: <code>NetworkErrorRatio()</code>,
+                <code>ResponseCodeRatio(500, 600, 0, 600)</code>, <code>LatencyAtQuantileMS(50.0)</code>
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Check Period</label>
+                <input type="text" class="form-control" name="cb_check_period"
+                       value="{{ form_data.get('cb_check_period','10s') }}" placeholder="10s">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fallback Duration</label>
+                <input type="text" class="form-control" name="cb_fallback"
+                       value="{{ form_data.get('cb_fallback','30s') }}" placeholder="30s">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Recovery Duration</label>
+                <input type="text" class="form-control" name="cb_recovery"
+                       value="{{ form_data.get('cb_recovery','10s') }}" placeholder="10s">
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ retry ══════════════════════════════════════ -->
+    <div id="type-retry" class="type-section" style="display:none;">
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Attempts <span class="text-danger">*</span></label>
+                <input type="number" min="1" class="form-control" name="retry_attempts"
+                       value="{{ form_data.get('retry_attempts','4') }}" placeholder="4">
+                <div class="form-text">Total retry attempts (including the first)</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Initial Interval</label>
+                <input type="text" class="form-control" name="retry_interval"
+                       value="{{ form_data.get('retry_interval','100ms') }}" placeholder="100ms">
+                <div class="form-text">Wait before first retry (e.g. 100ms, 1s)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ buffering ══════════════════════════════════ -->
+    <div id="type-buffering" class="type-section" style="display:none;">
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Max Request Body (bytes)</label>
+                <input type="number" min="0" class="form-control" name="buf_max_req"
+                       value="{{ form_data.get('buf_max_req','2097152') }}" placeholder="2097152">
+                <div class="form-text">0 = unlimited. Default 2 MB</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Max Response Body (bytes)</label>
+                <input type="number" min="0" class="form-control" name="buf_max_resp"
+                       value="{{ form_data.get('buf_max_resp','2097152') }}" placeholder="2097152">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Retry Expression</label>
+            <input type="text" class="form-control font-monospace" name="buf_retry_expr"
+                   value="{{ form_data.get('buf_retry_expr','') }}"
+                   placeholder="IsNetworkError() && Attempts() < 2">
+            <div class="form-text">Retry condition expression (leave blank to disable)</div>
+        </div>
+    </div>
+
+    <!-- ══ headers ════════════════════════════════════ -->
+    <div id="type-headers" class="type-section" style="display:none;">
+        <p class="fw-semibold text-secondary mb-2 mt-1">Security Headers</p>
+        <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="h_ssl_redirect" name="h_ssl_redirect" {% if form_data.get('h_ssl_redirect') %}checked{% endif %}><label class="form-check-label" for="h_ssl_redirect">SSL Redirect (HTTP→HTTPS)</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="h_frame_deny" name="h_frame_deny" {% if form_data.get('h_frame_deny') %}checked{% endif %}><label class="form-check-label" for="h_frame_deny">X-Frame-Options: DENY</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="h_nosniff" name="h_nosniff" {% if form_data.get('h_nosniff') %}checked{% endif %}><label class="form-check-label" for="h_nosniff">X-Content-Type-Options: nosniff</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="h_xss_filter" name="h_xss_filter" {% if form_data.get('h_xss_filter') %}checked{% endif %}><label class="form-check-label" for="h_xss_filter">X-XSS-Protection: 1; mode=block</label></div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="h_sts_subdomains" name="h_sts_subdomains" {% if form_data.get('h_sts_subdomains') %}checked{% endif %}><label class="form-check-label" for="h_sts_subdomains">HSTS includeSubDomains</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="h_sts_preload" name="h_sts_preload" {% if form_data.get('h_sts_preload') %}checked{% endif %}><label class="form-check-label" for="h_sts_preload">HSTS preload</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="h_force_sts" name="h_force_sts" {% if form_data.get('h_force_sts') %}checked{% endif %}><label class="form-check-label" for="h_force_sts">Force HSTS header (even on HTTP)</label></div>
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">HSTS Max-Age (seconds)</label>
+                <input type="number" min="0" class="form-control" name="h_sts_seconds"
+                       value="{{ form_data.get('h_sts_seconds','0') }}" placeholder="31536000">
+            </div>
+            <div class="col-md-8">
+                <label class="form-label">Referrer-Policy</label>
+                <select class="form-select" name="h_referrer_policy">
+                    {% for rp in ['','no-referrer','no-referrer-when-downgrade','origin','origin-when-cross-origin','same-origin','strict-origin','strict-origin-when-cross-origin','unsafe-url'] %}
+                    <option value="{{ rp }}" {% if form_data.get('h_referrer_policy','') == rp %}selected{% endif %}>{{ rp or '(not set)' }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Content-Security-Policy</label>
+            <input type="text" class="form-control font-monospace" name="h_csp"
+                   value="{{ form_data.get('h_csp','') }}"
+                   placeholder="default-src 'self'; script-src 'self' 'unsafe-inline'">
+        </div>
+        <p class="fw-semibold text-secondary mb-2">CORS</p>
+        <div class="mb-3">
+            <label class="form-label">Allowed Origins</label>
+            <input type="text" class="form-control" name="h_cors_origins"
+                   value="{{ form_data.get('h_cors_origins','') }}"
+                   placeholder="https://app.example.com, https://admin.example.com">
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Allowed Methods</label>
+                <input type="text" class="form-control" name="h_cors_methods"
+                       value="{{ form_data.get('h_cors_methods','') }}" placeholder="GET, POST, PUT, DELETE">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Allowed Headers</label>
+                <input type="text" class="form-control" name="h_cors_headers"
+                       value="{{ form_data.get('h_cors_headers','') }}" placeholder="Authorization, Content-Type">
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Max Age (seconds)</label>
+                <input type="number" min="0" class="form-control" name="h_cors_max_age"
+                       value="{{ form_data.get('h_cors_max_age','0') }}" placeholder="86400">
+            </div>
+            <div class="col-md-6 d-flex align-items-end pb-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="h_cors_credentials" name="h_cors_credentials"
+                           {% if form_data.get('h_cors_credentials') %}checked{% endif %}>
+                    <label class="form-check-label" for="h_cors_credentials">Allow Credentials</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ compress ═══════════════════════════════════ -->
+    <div id="type-compress" class="type-section" style="display:none;">
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Excluded Content-Types</label>
+                <input type="text" class="form-control" name="cmp_excluded"
+                       value="{{ form_data.get('cmp_excluded','text/event-stream') }}"
+                       placeholder="text/event-stream">
+                <div class="form-text">Comma-separated MIME types that should NOT be compressed</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Minimum Response Body (bytes)</label>
+                <input type="number" min="0" class="form-control" name="cmp_min_bytes"
+                       value="{{ form_data.get('cmp_min_bytes','1024') }}" placeholder="1024">
+                <div class="form-text">Responses smaller than this won't be compressed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ contentType ════════════════════════════════ -->
+    <div id="type-contentType" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ct_auto_detect" name="ct_auto_detect"
+                       {% if form_data.get('ct_auto_detect', True) %}checked{% endif %}>
+                <label class="form-check-label" for="ct_auto_detect">
+                    Auto-detect Content-Type when not set by backend
+                </label>
+            </div>
+            <div class="form-text mt-2">Prevents Traefik from sniffing the response body to guess Content-Type</div>
+        </div>
+    </div>
+
+    <!-- ══ ipWhiteList ════════════════════════════════ -->
+    <div id="type-ipWhiteList" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Allowed IP Ranges (CIDR) <span class="text-danger">*</span></label>
+            <textarea class="form-control font-monospace" name="ip_source_range" rows="3"
+                      placeholder="192.168.1.0/24, 10.0.0.0/8, 203.0.113.42/32">{{ form_data.get('ip_source_range','') }}</textarea>
+            <div class="form-text">Comma-separated CIDR ranges or individual IPs that are allowed to pass</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">IP Depth (X-Forwarded-For)</label>
+            <input type="number" min="0" class="form-control" name="ip_depth"
+                   value="{{ form_data.get('ip_depth','0') }}" placeholder="0">
+            <div class="form-text">0 = use the direct remote address. N = use N-th entry from X-Forwarded-For</div>
+        </div>
+    </div>
+
+    <!-- ══ chain ══════════════════════════════════════ -->
+    <div id="type-chain" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Middlewares <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="chain_middlewares"
+                   value="{{ form_data.get('chain_middlewares','') }}"
+                   placeholder="rate-limit, basic-auth, secure-headers">
+            <div class="form-text">Comma-separated list of existing middleware names to chain in order</div>
+        </div>
+    </div>
+
+    <!-- ══ grpcWeb ════════════════════════════════════ -->
+    <div id="type-grpcWeb" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Allowed Origins</label>
+            <input type="text" class="form-control" name="grpc_origins"
+                   value="{{ form_data.get('grpc_origins','*') }}"
+                   placeholder="*, https://app.example.com">
+            <div class="form-text">Comma-separated origins allowed for gRPC-Web cross-origin requests. Use <code>*</code> for all.</div>
+        </div>
+    </div>
+
+    <!-- ══ passTLSClientCert ══════════════════════════ -->
+    <div id="type-passTLSClientCert" class="type-section" style="display:none;">
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ptcc_pem" name="ptcc_pem"
+                       {% if form_data.get('ptcc_pem') %}checked{% endif %}>
+                <label class="form-check-label" for="ptcc_pem">
+                    Include PEM-encoded cert in <code>X-Forwarded-Tls-Client-Cert</code> header
+                </label>
+            </div>
+            <div class="form-text mt-2">
+                Passes TLS client certificate information to the upstream service via request headers.
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Form actions ─────────────────────────────── -->
+    {{ form_footer(url_for('http.list_middlewares'), 'Create Middleware') }}
+
+</form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const TYPE_SECTIONS = [
+    'addPrefix','stripPrefix','stripPrefixRegex','replacePath','replacePathRegex',
+    'redirectScheme','redirectRegex',
+    'basicAuth','digestAuth','forwardAuth',
+    'rateLimit','inFlightReq','circuitBreaker','retry','buffering',
+    'headers','compress','contentType',
+    'ipWhiteList','chain',
+    'grpcWeb','passTLSClientCert',
+];
+
+function showTypeSection(type) {
+    TYPE_SECTIONS.forEach(function(t) {
+        var el = document.getElementById('type-' + t);
+        if (el) el.style.display = (t === type) ? 'block' : 'none';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    var sel = document.getElementById('middleware_type');
+    if (sel && sel.value) showTypeSection(sel.value);
+});
+</script>
+{% endblock %}

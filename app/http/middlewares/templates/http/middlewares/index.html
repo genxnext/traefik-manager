@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_list, empty_state, btn_danger %}
+
+{% block title %}HTTP Middlewares — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item active">Middlewares</li>{% endblock %}
+
+{% block content %}
+{{ page_header_list('HTTP Middlewares', 'Transform, secure, or enrich requests and responses in your HTTP pipeline', url_for('http.create_middleware'), 'Create Middleware') }}
+
+{% if middlewares %}
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:40px;">#</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="action-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for middleware in middlewares %}
+            <tr>
+                <td class="tbl-muted">{{ loop.index }}</td>
+                <td><span class="tbl-name">{{ middleware }}</span></td>
+                <td>
+                    <span class="badge badge-rule" style="font-size:12px;">{{ middleware_types.get(middleware, 'unknown') }}</span>
+                </td>
+                <td class="action-col">
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('http.middleware_detail', name=middleware) }}" class="btn btn-sm btn-outline-secondary" title="View details"><i class="bi bi-eye"></i></a>
+                        <a href="{{ url_for('http.edit_middleware', name=middleware) }}" class="btn btn-sm btn-outline-secondary" title="Edit middleware"><i class="bi bi-pencil"></i></a>
+                        {{ btn_danger(url_for('http.delete_middleware', name=middleware), middleware, 'middleware') }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-footer-count">{{ middlewares|length }} middleware(s)</div>
+</div>
+{% else %}
+{{ empty_state('bi-funnel', 'No HTTP middlewares yet', 'Middlewares add authentication, rate limiting, redirects, and path manipulation to your routes.', url_for('http.create_middleware'), 'Create Middleware') }}
+{% endif %}
+{% endblock %}

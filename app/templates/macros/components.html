@@ -1,0 +1,384 @@
+{# =============================================================================
+   Traefik Manager — Global UI Component Macros
+   Import in any template:
+     {% from "macros/components.html" import page_header_list, page_header_form,
+                                            empty_state, form_footer,
+                                            btn_primary, btn_outline, btn_danger,
+                                            badge %}
+   =============================================================================
+#}
+
+{# ---------------------------------------------------------------------------
+   page_header_list
+   Use on every list page (routers, middlewares, services, domains, …).
+
+   Parameters:
+     title        — H1 text
+     description  — subtitle paragraph (pass '' to omit)
+     create_href  — url_for result for the "Create X" link
+     create_text  — button label, e.g. "Create Router"
+     create_icon  — Bootstrap Icons class, default "bi-plus-lg"
+   ---------------------------------------------------------------------------
+#}
+{% macro page_header_list(title, description, create_href, create_text, create_icon='bi-plus-lg') %}
+<div class="page-header">
+    <div>
+        <h1>{{ title }}</h1>
+        {% if description %}<p>{{ description }}</p>{% endif %}
+    </div>
+    <a href="{{ create_href }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi {{ create_icon }} me-1"></i>{{ create_text }}
+    </a>
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   page_header_form
+   Use on every create / edit page.
+
+   Parameters:
+     title       — H1 text
+     back_href   — url_for back-link destination
+     back_text   — label for back link, e.g. "Back to Routers"
+     subtitle    — optional small subtitle below H1
+     badge_text  — optional protocol badge text, e.g. "HTTP"
+     badge_class — Bootstrap badge variant for the protocol badge,
+                   e.g. "badge-http", "badge-tcp", "badge-udp"
+   ---------------------------------------------------------------------------
+#}
+{% macro page_header_form(title, back_href, back_text, subtitle='', badge_text='', badge_class='') %}
+<div class="page-header">
+    <div>
+        <h1>{{ title }}</h1>
+        {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        {% if badge_text %}
+        <span class="badge {{ badge_class }}">{{ badge_text }}</span>
+        {% endif %}
+        <a href="{{ back_href }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>{{ back_text }}
+        </a>
+    </div>
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   empty_state
+   Shown inside {% else %} blocks when a list has no items.
+
+   Parameters:
+     icon        — Bootstrap Icons class for the large icon, e.g. "bi-signpost-2"
+     title       — bold heading
+     description — explanation paragraph
+     action_href — url_for result for CTA button (pass '' to omit button)
+     action_text — button label
+     action_icon — Bootstrap Icons class for button icon, default "bi-plus-lg"
+   ---------------------------------------------------------------------------
+#}
+{% macro empty_state(icon, title, description, action_href='', action_text='', action_icon='bi-plus-lg') %}
+<div class="empty-state">
+    <i class="bi {{ icon }} d-block"></i>
+    <h5>{{ title }}</h5>
+    <p>{{ description }}</p>
+    {% if action_href %}
+    <div class="empty-action">
+        <a href="{{ action_href }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi {{ action_icon }} me-1"></i>{{ action_text }}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   form_footer
+   Standard create / edit form bottom row with Cancel + Submit.
+
+   Parameters:
+     cancel_href  — url_for back-link for the Cancel button
+     submit_text  — label on the submit button, e.g. "Create Router"
+     cancel_text  — label on cancel button (default "Cancel")
+   ---------------------------------------------------------------------------
+#}
+{% macro form_footer(cancel_href, submit_text, cancel_text='Cancel') %}
+<div class="d-flex justify-content-between mt-4">
+    <a href="{{ cancel_href }}" class="btn btn-outline-secondary">{{ cancel_text }}</a>
+    <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   btn_primary
+   Standalone primary action button (form submit).
+   Usage: <button type="submit">{{ btn_primary("Create Service") }}</button>
+   Or as standalone: {{ btn_primary("Create Service") }}
+
+   Parameters:
+     text   — button label
+     icon   — optional Bootstrap Icons class (pass '' to omit icon)
+   ---------------------------------------------------------------------------
+#}
+{% macro btn_primary(text, icon='') %}
+<button type="submit" class="btn btn-primary">
+    {% if icon %}<i class="bi {{ icon }} me-1"></i>{% endif %}{{ text }}
+</button>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   btn_outline
+   Secondary outline button — used for nav links, back buttons, cancel actions.
+
+   Parameters:
+     text  — label
+     href  — link target (omit or pass '' for a non-link button)
+     icon  — Bootstrap Icons class (pass '' to omit)
+     size  — "sm" (default) or "" for full-size
+   ---------------------------------------------------------------------------
+#}
+{% macro btn_outline(text, href='', icon='', size='sm') %}
+{% if href %}
+<a href="{{ href }}" class="btn {% if size %}btn-{{ size }} {% endif %}btn-outline-secondary">
+    {% if icon %}<i class="bi {{ icon }} me-1"></i>{% endif %}{{ text }}
+</a>
+{% else %}
+<button type="button" class="btn {% if size %}btn-{{ size }} {% endif %}btn-outline-secondary">
+    {% if icon %}<i class="bi {{ icon }} me-1"></i>{% endif %}{{ text }}
+</button>
+{% endif %}
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   btn_danger
+   Delete / destructive action — always wrapped in a form (POST).
+
+   Parameters:
+     action_url   — form action URL
+     item_name    — name of the item being deleted (used in confirm dialog)
+     item_type    — noun for the confirm message, e.g. "router"
+     btn_text     — button label (default "Delete")
+     icon         — Bootstrap Icons class (default "bi-trash")
+   ---------------------------------------------------------------------------
+#}
+{% macro btn_danger(action_url, item_name, item_type='item', btn_text='Delete', icon='bi-trash') %}
+<form method="POST" action="{{ action_url }}" class="d-inline"
+      onsubmit="return confirm('Delete {{ item_type }} &quot;{{ item_name }}&quot;?\nThis cannot be undone.')">
+    <button type="submit" class="btn btn-sm btn-outline-danger">
+        <i class="bi {{ icon }}"></i>
+    </button>
+</form>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   badge
+   Status / protocol badge.
+
+   Parameters:
+     text    — badge label
+     variant — CSS class suffix, one of:
+               "http"  → badge-http  (blue)
+               "tcp"   → badge-tcp   (teal)
+               "udp"   → badge-udp   (purple)
+               "tls"   → badge-tls   (amber)
+               "rule"  → badge-rule  (slate)
+               "active"   → bg-success text-white
+               "inactive" → bg-secondary text-white
+               "warning"  → bg-warning text-dark
+               "danger"   → bg-danger text-white
+   ---------------------------------------------------------------------------
+#}
+{% macro badge(text, variant='rule') %}
+{% if variant in ('active',) %}
+<span class="badge bg-success">{{ text }}</span>
+{% elif variant in ('inactive', 'disabled') %}
+<span class="badge bg-secondary">{{ text }}</span>
+{% elif variant == 'warning' %}
+<span class="badge bg-warning text-dark">{{ text }}</span>
+{% elif variant == 'danger' %}
+<span class="badge bg-danger">{{ text }}</span>
+{% else %}
+<span class="badge badge-{{ variant }}">{{ text }}</span>
+{% endif %}
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   form_field
+   A labeled form field wrapper. Supports text, number, url, password, email.
+
+   Parameters:
+     label       — visible label text
+     name        — input name + id
+     type        — HTML input type (default "text")
+     value       — current value
+     required    — boolean
+     placeholder — placeholder text
+     help_text   — small helper below input
+     pattern     — HTML pattern attribute
+     monospace   — add font-monospace class for code-like fields
+     extra_attrs — raw additional HTML attributes string (e.g., 'min="0" max="100"')
+   ---------------------------------------------------------------------------
+#}
+{% macro form_field(label, name, type='text', value='', required=false, placeholder='', help_text='', pattern='', monospace=false, extra_attrs='') %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="text-danger">*</span>{% endif %}
+    </label>
+    <input type="{{ type }}"
+           class="form-control{% if monospace %} font-monospace{% endif %}"
+           id="{{ name }}"
+           name="{{ name }}"
+           value="{{ value }}"
+           {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+           {% if required %}required{% endif %}
+           {% if pattern %}pattern="{{ pattern }}"{% endif %}
+           {{ extra_attrs }}>
+    {% if help_text %}<div class="form-text">{{ help_text }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   form_field_checkbox
+   A single form-check checkbox.
+
+   Parameters:
+     label      — visible label text
+     name       — input name + id
+     checked    — boolean for default checked state
+     help_text  — optional helper text below
+   ---------------------------------------------------------------------------
+#}
+{% macro form_field_checkbox(label, name, checked=false, help_text='') %}
+<div class="mb-3">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox"
+               id="{{ name }}" name="{{ name }}" value="1"
+               {% if checked %}checked{% endif %}>
+        <label class="form-check-label" for="{{ name }}">{{ label }}</label>
+    </div>
+    {% if help_text %}<div class="form-text">{{ help_text }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   form_field_select
+   A labeled <select> field.
+
+   Parameters:
+     label     — visible label text
+     name      — select name + id
+     options   — list of (value, display) tuples  OR  list of plain strings
+     selected  — currently selected value
+     required  — boolean
+     help_text — small helper below
+     multiple  — boolean, renders a multi-select
+     size      — visible rows for multi-select (default 6)
+   ---------------------------------------------------------------------------
+#}
+{% macro form_field_select(label, name, options, selected='', required=false, help_text='', multiple=false, size=6) %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="text-danger">*</span>{% endif %}
+    </label>
+    <select class="form-select"
+            id="{{ name }}"
+            name="{{ name }}"
+            {% if multiple %}multiple size="{{ size }}"{% endif %}
+            {% if required %}required{% endif %}>
+        {% if not multiple %}
+        <option value="">— select —</option>
+        {% endif %}
+        {% for opt in options %}
+            {% if opt is iterable and opt is not string %}
+                {# (value, label) tuple #}
+                <option value="{{ opt[0] }}"
+                    {% if opt[0] == selected or opt[0] in selected %}selected{% endif %}>
+                    {{ opt[1] }}
+                </option>
+            {% else %}
+                <option value="{{ opt }}"
+                    {% if opt == selected or opt in selected %}selected{% endif %}>
+                    {{ opt }}
+                </option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    {% if help_text %}<div class="form-text">{{ help_text }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   form_field_textarea
+   A labeled <textarea> field.
+
+   Parameters:
+     label      — visible label text
+     name       — textarea name + id
+     value      — current content
+     rows       — visible row count (default 4)
+     placeholder— placeholder text
+     help_text  — small helper below
+     monospace  — add font-monospace class
+   ---------------------------------------------------------------------------
+#}
+{% macro form_field_textarea(label, name, value='', rows=4, placeholder='', help_text='', monospace=true) %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label">{{ label }}</label>
+    <textarea class="form-control{% if monospace %} font-monospace{% endif %}"
+              id="{{ name }}" name="{{ name }}"
+              rows="{{ rows }}"
+              {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}>{{ value }}</textarea>
+    {% if help_text %}<div class="form-text">{{ help_text }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   table_actions_cell
+   Renders the standard Edit + Delete action buttons in a table row.
+
+   Parameters:
+     edit_href    — href for the edit (pencil) button
+     delete_url   — form action for delete POST
+     item_name    — display name used in confirm dialog
+     item_type    — noun (e.g. "router", "service")
+     extra_before — raw HTML to inject before edit button
+   ---------------------------------------------------------------------------
+#}
+{% macro table_actions_cell(edit_href, delete_url, item_name, item_type='item', extra_before='') %}
+<td class="text-end">
+    {{ extra_before }}
+    <a href="{{ edit_href }}" class="btn btn-sm btn-outline-secondary" title="Edit">
+        <i class="bi bi-pencil"></i>
+    </a>
+    <form method="POST" action="{{ delete_url }}" class="d-inline"
+          onsubmit="return confirm('Delete {{ item_type }} &quot;{{ item_name }}&quot;?\nThis cannot be undone.')">
+        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+            <i class="bi bi-trash"></i>
+        </button>
+    </form>
+</td>
+{% endmacro %}
+
+
+{# ---------------------------------------------------------------------------
+   section_title
+   A visual section divider within a form.
+
+   Parameters:
+     text — section heading text
+   ---------------------------------------------------------------------------
+#}
+{% macro section_title(text) %}
+<div class="form-section-title">{{ text }}</div>
+{% endmacro %}

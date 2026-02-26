@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Edit Domain — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">Config</li><li class="breadcrumb-item active">Edit Domain: {{ domain.name }}</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Edit Domain: ' ~ domain.name, url_for('http.list_domains'), 'Back to Domains') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('http.edit_domain', name=domain.name) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Domain Name</label>
+                        <input type="text" class="form-control" value="{{ domain.name }}" disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cert_resolver" class="form-label">Certificate Resolver <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="cert_resolver" name="cert_resolver"
+                               value="{{ form_data.get('cert_resolver', domain.cert_resolver) }}"
+                               placeholder="letsencrypt" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sans" class="form-label">SANs (optional)</label>
+                        <input type="text" class="form-control" id="sans" name="sans"
+                               value="{{ form_data.get('sans', '') }}"
+                               placeholder="www.example.com, api.example.com">
+                        <div class="form-text">Comma-separated Subject Alternative Names</div>
+                    </div>
+
+                    {{ form_footer(url_for('http.list_domains'), 'Update Domain') }}
+                </form>
+{% endblock %}

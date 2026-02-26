@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from "macros/components.html" import page_header_form, form_footer %}
+
+{% block title %}Edit TLS Options — Traefik Manager{% endblock %}
+
+{% block breadcrumb %}<li class="breadcrumb-item">TLS</li><li class="breadcrumb-item active">Edit TLS Options: {{ opts_name }}</li>{% endblock %}
+
+{% block content %}
+{{ page_header_form('Edit TLS Options: ' ~ opts_name, url_for('tls.list_tls_options'), 'Back to TLS Options') }}
+
+<div class="form-card">
+                <form method="POST" action="{{ url_for('tls.edit_tls_options', name=opts_name) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Options Name</label>
+                        <input type="text" class="form-control" value="{{ opts_name }}" disabled>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="min_version" class="form-label">Minimum TLS Version</label>
+                            <select class="form-select" id="min_version" name="min_version">
+                                <option value="" {% if not form_data.get('min_version') %}selected{% endif %}>-- Not set --</option>
+                                <option value="VersionTLS10" {% if form_data.get('min_version') == 'VersionTLS10' %}selected{% endif %}>TLS 1.0</option>
+                                <option value="VersionTLS11" {% if form_data.get('min_version') == 'VersionTLS11' %}selected{% endif %}>TLS 1.1</option>
+                                <option value="VersionTLS12" {% if form_data.get('min_version') == 'VersionTLS12' %}selected{% endif %}>TLS 1.2</option>
+                                <option value="VersionTLS13" {% if form_data.get('min_version') == 'VersionTLS13' %}selected{% endif %}>TLS 1.3</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="max_version" class="form-label">Maximum TLS Version</label>
+                            <select class="form-select" id="max_version" name="max_version">
+                                <option value="" {% if not form_data.get('max_version') %}selected{% endif %}>-- Not set --</option>
+                                <option value="VersionTLS10" {% if form_data.get('max_version') == 'VersionTLS10' %}selected{% endif %}>TLS 1.0</option>
+                                <option value="VersionTLS11" {% if form_data.get('max_version') == 'VersionTLS11' %}selected{% endif %}>TLS 1.1</option>
+                                <option value="VersionTLS12" {% if form_data.get('max_version') == 'VersionTLS12' %}selected{% endif %}>TLS 1.2</option>
+                                <option value="VersionTLS13" {% if form_data.get('max_version') == 'VersionTLS13' %}selected{% endif %}>TLS 1.3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cipher_suites" class="form-label">Cipher Suites</label>
+                        <textarea class="form-control" id="cipher_suites" name="cipher_suites"
+                                  rows="3"
+                                  placeholder="TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384">{{ form_data.get('cipher_suites', '') }}</textarea>
+                        <div class="form-text">Comma-separated list. Leave empty for defaults.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="curve_preferences" class="form-label">Curve Preferences</label>
+                        <input type="text" class="form-control" id="curve_preferences" name="curve_preferences"
+                               value="{{ form_data.get('curve_preferences', '') }}"
+                               placeholder="X25519, CurveP256, CurveP384">
+                        <div class="form-text">Comma-separated elliptic curves</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="sni_strict"
+                                   id="sni_strict"
+                                   {% if form_data.get('sni_strict') %}checked{% endif %}>
+                            <label class="form-check-label" for="sni_strict">
+                                <strong>SNI Strict</strong> — Reject connections without matching SNI
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="alpn_protocols" class="form-label">ALPN Protocols</label>
+                        <input type="text" class="form-control" id="alpn_protocols" name="alpn_protocols"
+                               value="{{ form_data.get('alpn_protocols', '') }}"
+                               placeholder="h2, http/1.1, acme-tls/1">
+                        <div class="form-text">Comma-separated ALPN protocols</div>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Client Authentication (mTLS)</h6>
+                            <div class="mb-3">
+                                <label for="client_auth_type" class="form-label">Client Auth Type</label>
+                                <select class="form-select" id="client_auth_type" name="client_auth_type">
+                                    <option value="" {% if not form_data.get('client_auth_type') %}selected{% endif %}>-- None --</option>
+                                    {% for t in ['NoClientCert', 'RequestClientCert', 'RequireAnyClientCert', 'VerifyClientCertIfGiven', 'RequireAndVerifyClientCert'] %}
+                                    <option value="{{ t }}" {% if form_data.get('client_auth_type') == t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="client_auth_ca_files" class="form-label">Client CA Files</label>
+                                <input type="text" class="form-control" id="client_auth_ca_files" name="client_auth_ca_files"
+                                       value="{{ form_data.get('client_auth_ca_files', '') }}"
+                                       placeholder="/path/to/ca1.pem, /path/to/ca2.pem">
+                                <div class="form-text">Comma-separated paths to CA certificate files</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_footer(url_for('tls.list_tls_options'), 'Update TLS Options') }}
+                </form>
+{% endblock %}

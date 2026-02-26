@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ middleware_name }} — Middleware Detail — Traefik Manager{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item">HTTP</li><li class="breadcrumb-item"><a href="{{ url_for('http.list_middlewares') }}">Middlewares</a></li><li class="breadcrumb-item active">{{ middleware_name }}</li>{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ middleware_name }}</h1>
+        <p>Middleware detail — type, parsed config and raw etcd keys</p>
+    </div>
+    <a href="{{ url_for('http.list_middlewares') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Middlewares
+    </a>
+</div>
+
+<div class="data-table mb-4">
+    <div class="px-3 py-3">
+        <p class="form-section-title mb-2">Type</p>
+        <span class="badge badge-rule">{{ middleware_type }}</span>
+    </div>
+</div>
+
+<div class="data-table">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if middleware_config %}
+            {% for key, value in middleware_config.items() %}
+            <tr>
+                <td><code class="tbl-muted">{{ key }}</code></td>
+                <td><code>{{ value }}</code></td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr><td colspan="2" class="tbl-muted text-center py-3">No parsed config found.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% if middleware_config %}<div class="table-footer-count">{{ middleware_config|length }} field(s)</div>{% endif %}
+</div>
+{% endblock %}
