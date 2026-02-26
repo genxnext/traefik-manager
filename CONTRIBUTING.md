@@ -46,12 +46,11 @@ git clone https://github.com/genxnext/traefik-manager.git
 cd traefik-manager
 
 # 2. Create virtual environment
-python3 -m venv .venv
+uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # 3. Install dependencies
-pip install -r requirements.txt
-pip install -r requirements-dev.txt  # Development tools
+uv sync
 
 # 4. Set environment variables
 cp .env.example .env
@@ -333,7 +332,7 @@ Fixes #<issue-number>
 
 ```bash
 # Install dev dependencies
-pip install -r requirements-dev.txt
+uv sync
 
 # Run all tests
 pytest
@@ -550,7 +549,7 @@ git log --oneline --graph --all
 flask shell
 
 # Using pudb (better than pdb)
-pip install pudb
+uv add pudb
 # Then: set_trace()  # or breakpoint()
 
 # Inspect etcd

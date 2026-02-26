@@ -106,7 +106,7 @@ See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for full manifests and setup.
 ### Manual
 
 ```bash
-pip install -r requirements.txt
+uv sync
 export ETCD_URL=http://localhost:2379 FLASK_SECRET_KEY=your-key
 python webui.py
 ```
@@ -116,9 +116,9 @@ python webui.py
 ## 🧑‍💻 Development
 
 ```bash
-python3 -m venv .venv
+uv venv
 source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 export ETCD_URL=http://localhost:2379 FLASK_SECRET_KEY=dev-key
 python webui.py
 ```

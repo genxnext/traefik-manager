@@ -377,7 +377,7 @@ For production deployments with multiple instances, PostgreSQL is recommended:
 
 ```bash
 # Requirements
-pip install psycopg2-binary
+uv add psycopg2-binary
 
 # Connection string
 DATABASE_URL=postgresql://user:password@db:5432/traefik_manager
