@@ -1,0 +1,2110 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Web UI and docs for managing Traefik (etcd v3)">
+      
+      
+        <meta name="author" content="GXNT TECH PVT LTD">
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../DEPLOYMENT_GUIDE/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Architecture - GXNT Traefik Manager</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gxnt-traefik-manager-architecture-design" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="GXNT Traefik Manager" class="md-header__button md-logo" aria-label="GXNT Traefik Manager" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GXNT Traefik Manager
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/genxnext/traefik-manager" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="GXNT Traefik Manager" class="md-nav__button md-logo" aria-label="GXNT Traefik Manager" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    GXNT Traefik Manager
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/genxnext/traefik-manager" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technology-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Stack
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technology Stack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies (Core)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-etcdclient-coreetcd_clientpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ETCDClient (core/etcd_client.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configmanager-coreconfig_managerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. ConfigManager (core/config_manager.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-models-coremodelspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Models (core/models.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-flask-blueprints-feature-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Flask Blueprints (Feature Modules)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-authentication-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Authentication &amp; Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-templates-ui-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Templates &amp; UI Layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-user-creates-a-new-http-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. User Creates a New HTTP Router
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-system-exports-full-backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. System Exports Full Backup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-system-imports-backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. System Imports Backup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication &amp; Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secrets-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secrets Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-trail-v11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit Trail (v1.1+)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scalability-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability &amp; Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scalability &amp; Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#horizontal-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Horizontal Scaling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-characteristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Characteristics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extension-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Points
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extension Points">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Protocol
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-middleware-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Middleware Type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-validators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Validators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-pattern-v11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Pattern (v1.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v10-current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.0 (Current)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v11-q1-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.1 (Q1 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v12-q2-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.2 (Q2 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technology-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Stack
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technology Stack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies (Core)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-etcdclient-coreetcd_clientpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ETCDClient (core/etcd_client.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configmanager-coreconfig_managerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. ConfigManager (core/config_manager.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-models-coremodelspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Models (core/models.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-flask-blueprints-feature-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Flask Blueprints (Feature Modules)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-authentication-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Authentication &amp; Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-templates-ui-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Templates &amp; UI Layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-user-creates-a-new-http-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. User Creates a New HTTP Router
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-system-exports-full-backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. System Exports Full Backup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-system-imports-backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. System Imports Backup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication &amp; Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secrets-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secrets Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-trail-v11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit Trail (v1.1+)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scalability-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability &amp; Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scalability &amp; Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#horizontal-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Horizontal Scaling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-characteristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Characteristics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extension-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Points
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extension Points">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Protocol
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-middleware-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Middleware Type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-validators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Validators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-pattern-v11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Pattern (v1.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v10-current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.0 (Current)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v11-q1-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.1 (Q1 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v12-q2-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.2 (Q2 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="gxnt-traefik-manager-architecture-design">GXNT Traefik Manager — Architecture &amp; Design</h1>
+<p><strong>Version:</strong> 1.0<br />
+<strong>Last Updated:</strong> February 2026<br />
+<strong>Audience:</strong> Developers, DevOps Engineers, Architects</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#system-architecture">System Architecture</a></li>
+<li><a href="#technology-stack">Technology Stack</a></li>
+<li><a href="#core-components">Core Components</a></li>
+<li><a href="#data-flow">Data Flow</a></li>
+<li><a href="#security-model">Security Model</a></li>
+<li><a href="#scalability--performance">Scalability &amp; Performance</a></li>
+<li><a href="#extension-points">Extension Points</a></li>
+<li><a href="#development-patterns">Development Patterns</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<p><strong>GXNT Traefik Manager</strong> is a production-grade web interface for managing Traefik v2.x routing configurations. It provides a <strong>safe, validated, multi-protocol configuration UI</strong> backed by <strong>etcd v3</strong> as the primary data store.</p>
+<h3 id="key-principles">Key Principles</h3>
+<ul>
+<li><strong>Safety First</strong>: All inputs validated; invalid requests rejected (even crafted ones)</li>
+<li><strong>Multi-Protocol</strong>: HTTP, TCP, UDP, TLS protocols with unified orchestration</li>
+<li><strong>Multi-Tenant Ready</strong>: Support multiple etcd connections (profiles) from single UI</li>
+<li><strong>Stateless</strong>: Horizontal scalable; authentication state in SQLite, routing config in etcd</li>
+<li><strong>Developer-Friendly</strong>: Modular Flask Blueprints, clear separation of concerns</li>
+</ul>
+<h3 id="use-cases">Use Cases</h3>
+<ol>
+<li><strong>Enterprise Routing</strong>: Manage 100+ HTTP routes with middleware chains</li>
+<li><strong>Microservices Ingress</strong>: Control TCP/UDP ingress for Kubernetes-like environments</li>
+<li><strong>Multi-Cloud Load Balancing</strong>: Centralized TLS + certificate resolver management</li>
+<li><strong>DevOps Automation</strong>: API-friendly configuration (future REST API in v1.1)</li>
+</ol>
+<hr />
+<h2 id="system-architecture">System Architecture</h2>
+<pre><code>┌────────────────────────────────────────────────────────────────┐
+│                       Web Browser / Client                      │
+└────────────────┬───────────────────────────────────────────────┘
+                 │ HTTPS (TLS recommended)
+                 ▼
+┌────────────────────────────────────────────────────────────────┐
+│              Flask Web Server (webui.py entry)                 │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  app/ (Feature-based packages)                           │  │
+│  │  ├─ auth/: Login, password management                    │  │
+│  │  ├─ common/: Home, help, etcd connection settings        │  │
+│  │  ├─ config/: Export/import (full + incremental)          │  │
+│  │  ├─ http/: HTTP routing (routers, services, etc.)        │  │
+│  │  │   ├─ routers/: HTTP router CRUD                       │  │
+│  │  │   ├─ services/: HTTP service CRUD                     │  │
+│  │  │   ├─ middlewares/: HTTP middleware CRUD               │  │
+│  │  │   ├─ domains/: Global domains &amp; cert config           │  │
+│  │  │   └─ servers_transports/: Upstream TLS config         │  │
+│  │  ├─ tcp/: TCP (routers, services, middlewares)           │  │
+│  │  ├─ udp/: UDP (routers, services)                        │  │
+│  │  ├─ tls/: TLS options &amp; certificate stores              │  │
+│  │  └─ health/: Liveness probe (/api/health)               │  │
+│  │                                                           │  │
+│  │  core/ (Data &amp; etcd layer)                              │  │
+│  │  ├─ etcd_client.py: etcd v3 API wrapper                 │  │
+│  │  ├─ config_manager.py: High-level config orchestration   │  │
+│  │  └─ models.py: Dataclasses for all entity types         │  │
+│  │                                                           │  │
+│  │  auth_db.py: SQLite auth + etcd connection profiles      │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  Static Assets: design tokens, icons, styles (Bootstrap 5.3)  │
+│  Templates: 68+ Jinja2 templates (feature-based co-location)   │
+└────────────┬──────────────────────────────────────────────────┘
+             │
+             ├─────────────┬─────────────┐
+             ▼             ▼             ▼
+        ┌─────────┐   ┌─────────┐   ┌─────────┐
+        │  etcd   │   │ SQLite  │   │ Traefik │
+        │ v3 API  │   │ (auth)  │   │ (reads) │
+        │ (config)│   └─────────┘   └─────────┘
+        └─────────┘
+            │
+            └─→ Traefik v2.x (listens to /traefik/* keys)
+                Manages actual routing / forwarding
+</code></pre>
+<hr />
+<h2 id="technology-stack">Technology Stack</h2>
+<h3 id="frontend">Frontend</h3>
+<ul>
+<li><strong>Framework</strong>: Flask 2.x with Jinja2 templating</li>
+<li><strong>UI Components</strong>: Bootstrap 5.3.2</li>
+<li><strong>Icons</strong>: Bootstrap Icons</li>
+<li><strong>Styling</strong>: CSS Grid + Flexbox with design tokens</li>
+<li><strong>Interactivity</strong>: Vanilla JavaScript (Babel/build-free)</li>
+<li><strong>Theme</strong>: Light/Dark mode (localStorage-backed)</li>
+<li><strong>Accessibility</strong>: WCAG 2.1 AAA compliant</li>
+</ul>
+<h3 id="backend">Backend</h3>
+<ul>
+<li><strong>Language</strong>: Python 3.9+</li>
+<li><strong>Framework</strong>: Flask 2.x</li>
+<li><strong>Architecture</strong>: Blueprint-based (feature domains)</li>
+<li><strong>Config Storage</strong>: etcd v3</li>
+<li><strong>State Storage</strong>: SQLite (auth, connection profiles)</li>
+<li><strong>Validation</strong>: Pydantic and custom validators</li>
+<li><strong>Serialization</strong>: JSON (with custom encoder for uncommon types)</li>
+</ul>
+<h3 id="infrastructure">Infrastructure</h3>
+<ul>
+<li><strong>Containerization</strong>: Docker + Docker Compose</li>
+<li><strong>Logs</strong>: stdout/stderr (12-factor app compatible)</li>
+<li><strong>Signals</strong>: systemd/Docker managed graceful shutdown</li>
+<li><strong>Config</strong>: Environment variables (.env file)</li>
+</ul>
+<h3 id="dependencies-core">Dependencies (Core)</h3>
+<ul>
+<li><code>flask</code> — Web framework</li>
+<li><code>requests</code> — etcd v3 HTTP API client</li>
+<li><code>pydantic</code> — Data validation</li>
+<li>(See <code>requirements.txt</code> for complete list)</li>
+</ul>
+<hr />
+<h2 id="core-components">Core Components</h2>
+<h3 id="1-etcdclient-coreetcd_clientpy">1. ETCDClient (<code>core/etcd_client.py</code>)</h3>
+<p><strong>Responsibility</strong>: Abstract etcd v3 HTTP REST API.</p>
+<p><strong>Key Methods</strong>:</p>
+<ul>
+<li><code>put(key, value)</code> — Write a key-value pair</li>
+<li><code>get(key)</code> — Fetch single key</li>
+<li><code>get_prefix(prefix)</code> — Fetch all keys under a prefix (with pagination support via <code>limit: 0</code>)</li>
+<li><code>delete(key)</code> — Remove a key</li>
+<li><code>delete_prefix(prefix)</code> — Remove all keys under prefix</li>
+<li><code>health_check()</code> — Verify etcd reachability</li>
+</ul>
+<p><strong>Design Decisions</strong>:</p>
+<ul>
+<li>Uses base64 encoding/decoding (etcd v3 API requirement)</li>
+<li>Implements timeout &amp; exception handling</li>
+<li>Range queries for prefix-based operations</li>
+<li>No caching layer (fresh reads on every request)</li>
+</ul>
+<p><strong>Scaling Impact</strong>: Direct etcd client; latency scales with etcd distance/network.</p>
+<hr />
+<h3 id="2-configmanager-coreconfig_managerpy">2. ConfigManager (<code>core/config_manager.py</code>)</h3>
+<p><strong>Responsibility</strong>: High-level orchestration of router, service, middleware CRUD.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>Lazy loading with in-memory cache (list* methods populate caches)</li>
+<li>Validation before write (prevents invalid configs reaching etcd)</li>
+<li>Transactions (atomic multi-key operations where possible)</li>
+<li>Error handling &amp; recovery patterns</li>
+</ul>
+<p><strong>Cache Strategy</strong>:</p>
+<pre><code>User clicks &quot;Save Router&quot;
+  → ConfigManager.update_router(Router object)
+    → Validate against service/middleware/domain lists (cache)
+    → Split Router into ~5 etcd keys (entrypoint, rule, service, tls, priority)
+    → WriteTo etcd via ETCDClient.put()
+    → Update internal cache
+    → Return success
+</code></pre>
+<p><strong>Limitations</strong>:</p>
+<ul>
+<li>No distributed transaction support (eventual consistency possible)</li>
+<li>Cache invalidation relies on list-refresh (no pub/sub)</li>
+</ul>
+<hr />
+<h3 id="3-models-coremodelspy">3. Models (<code>core/models.py</code>)</h3>
+<p><strong>Responsibility</strong>: Type safety for all Traefik entities.</p>
+<p><strong>Key Dataclasses</strong>:</p>
+<ul>
+<li><code>Router</code> — HTTP routing rule + service binding</li>
+<li><code>Service</code> — Load balancer pool + health checks</li>
+<li><code>MiddlewareType</code> (Enum) — 20+ middleware types (RateLimit, Auth, Compress, etc.)</li>
+<li><code>TCPRouter</code>, <code>UDPRouter</code> — Layer 4 routing</li>
+<li><code>TLSOptions</code>, <code>TLSStore</code> — Certificate config</li>
+<li><code>ServersTransport</code> — Upstream TLS settings</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>Pydantic <code>model_validate()</code> for deep validation</li>
+<li>Custom validators for complex rules (e.g., regex syntax)</li>
+<li>Enum enforcement for known fields (no free text for cert resolvers)</li>
+</ul>
+<hr />
+<h3 id="4-flask-blueprints-feature-modules">4. Flask Blueprints (Feature Modules)</h3>
+<p><strong>Architecture</strong>: Feature-based, not MVC-based.</p>
+<pre><code>app/
+├─ auth/: Authentication feature
+├─ common/: Home, help, connection management
+├─ config/: Backup/restore feature
+├─ http/: HTTP protocol family
+│  ├─ routers/: Router CRUD
+│  ├─ services/: Service CRUD
+│  ├─ middlewares/: Middleware CRUD
+│  ├─ domains/: Domain config
+│  └─ servers_transports/: Upstream transport config
+├─ tcp/: TCP protocol family
+├─ udp/: UDP protocol family
+└─ tls/: TLS config family
+</code></pre>
+<p><strong>Each feature package</strong>:</p>
+<ul>
+<li><code>__init__.py</code> — Blueprint registration + imports</li>
+<li><code>views.py</code> — Route handlers (list, create, edit, delete)</li>
+<li><code>templates/&lt;feature&gt;/</code> — HTML templates (co-located with logic)</li>
+</ul>
+<p><strong>Example: HTTP Router Feature</strong>:</p>
+<pre><code class="language-python"># app/http/routers/__init__.py
+bp = Blueprint('http.routers', __name__, template_folder='templates')
+# (register views via endpoint decorators)
+
+# app/http/routers/views.py
+@bp.route('/routers')
+def list_routers():
+    routers = config_manager.list_routers()
+    return render_template('http/routers/index.html', routers=routers)
+</code></pre>
+<p><strong>Benefits</strong>:</p>
+<ul>
+<li>Self-contained features (no global dependencies)</li>
+<li>Easy to add new protocol (copy <code>/tcp</code> → <code>/new_proto</code>)</li>
+<li>Clear ownership (one team → one feature)</li>
+<li>Scalable testing (unit test per feature)</li>
+</ul>
+<hr />
+<h3 id="5-authentication-authorization">5. Authentication &amp; Authorization</h3>
+<p><strong>SQLite Layer</strong> (<code>auth_db.py</code>):</p>
+<ul>
+<li>Stores user credentials (hashed passwords via <code>werkzeug.security</code>)</li>
+<li>Manages etcd connection profiles (name, URL, description)</li>
+<li>Login session management</li>
+</ul>
+<p><strong>Flask Session</strong>:</p>
+<ul>
+<li>Server-side session storage (in-memory for v1.0, Redis for v2.0)</li>
+<li>CSRF protection enabled</li>
+<li>Secure cookie flags (HttpOnly, Secure when TLS)</li>
+</ul>
+<p><strong>Access Control</strong>:</p>
+<ul>
+<li>Simple: Authenticated → Full access (no RBAC in v1.0)</li>
+<li>v1.1 Roadmap: Role-based access control (admin, viewer, editor)</li>
+</ul>
+<hr />
+<h3 id="6-templates-ui-layer">6. Templates &amp; UI Layer</h3>
+<p><strong>Structure</strong>:</p>
+<ul>
+<li><code>app/templates/base.html</code> — Master layout (sidebar, topbar, flash messages)</li>
+<li><code>app/&lt;feature&gt;/templates/&lt;feature&gt;/*.html</code> — Feature templates</li>
+</ul>
+<p><strong>Template Naming Convention</strong>:</p>
+<ul>
+<li><code>index.html</code> — List all entities</li>
+<li><code>create.html</code> — Form to create new entity</li>
+<li><code>edit.html</code> — Form to edit existing entity</li>
+<li><code>detail.html</code> — Read-only detail view</li>
+</ul>
+<p><strong>Design System</strong>:</p>
+<ul>
+<li>CSS variables for colors, spacing, typography (light/dark modes)</li>
+<li>Bootstrap 5.3.2 for responsive grid</li>
+<li>JS utilities for form validation, loading states, alerts</li>
+</ul>
+<hr />
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="a-user-creates-a-new-http-router">A. User Creates a New HTTP Router</h3>
+<pre><code>1. User navigates to /routers
+   → Flask renders http/routers/index.html with list of routers
+
+2. User clicks &quot;Create&quot; button
+   → Browser GET /routers/create
+   → Served form (create.html) with dropdowns for services/middlewares
+
+3. User submits form
+   → Browser POST /routers/create with form data
+   → Flask view validates inputs (checks service exists, rule syntax)
+   → ConfigManager.create_router(Router(...))
+     → Splits into 5 etcd keys:
+        - traefik/http/routers/myrouter/entrypoints/0 → &quot;web&quot;
+        - traefik/http/routers/myrouter/rule → &quot;Host(`example.com`)&quot;
+        - traefik/http/routers/myrouter/service → &quot;mysvc&quot;
+        - traefik/http/routers/myrouter/priority → &quot;10&quot;
+        - traefik/http/routers/myrouter/tls → &quot;1&quot;
+   → ETCDClient.put() each key
+   → Traefik watches /traefik/* keys, detects changes → reloads config
+
+4. User redirected to /routers with success flash
+</code></pre>
+<h3 id="b-system-exports-full-backup">B. System Exports Full Backup</h3>
+<pre><code>1. User clicks &quot;Export Full Backup&quot; on /config/export
+
+2. Flask view export_full_backup():
+   → Calls ETCDClient.get_prefix('traefik/') → returns 27+ keys
+   → JSON structure:
+      {
+        &quot;version&quot;: &quot;1.0&quot;,
+        &quot;exported_at&quot;: &quot;2025-02-26T10:30:00Z&quot;,
+        &quot;etcd_prefix&quot;: &quot;traefik/&quot;,
+        &quot;etcd_kvs&quot;: { &quot;traefik/http/routers/...&quot;: &quot;...&quot;, ... },
+        &quot;connections&quot;: [ { &quot;name&quot;: &quot;prod&quot;, &quot;url&quot;: &quot;http://etcd:2379&quot; } ]
+      }
+   → Response with Content-Disposition: attachment; filename=traefik-backup-*.json
+
+3. Browser downloads traefik-backup-20250226-103000.json
+</code></pre>
+<h3 id="c-system-imports-backup">C. System Imports Backup</h3>
+<pre><code>1. User selects backup file on /config/import
+
+2. Flask view import_full_backup():
+   → Reads JSON file
+   → Validate structure (must have &quot;etcd_kvs&quot; key)
+   → Iterate over etcd_kvs, call ETCDClient.put(key, value) for each
+   → Optionally restore connection profiles
+   → Redirect with summary (20 keys restored, 3 skipped)
+
+3. Traefik detects new keys → reloads config
+</code></pre>
+<hr />
+<h2 id="security-model">Security Model</h2>
+<h3 id="input-validation">Input Validation</h3>
+<p><strong>Three Layers</strong>:</p>
+<ol>
+<li><strong>Form Layer</strong>: HTML5 <code>required</code>, <code>pattern</code> attributes</li>
+<li><strong>Python Layer</strong>: Pydantic validators + custom logic</li>
+<li><strong>Traefik Layer</strong>: Traefik validates actual routing rules (safe fallibility)</li>
+</ol>
+<p><strong>Example: Router Creation</strong>:</p>
+<pre><code class="language-python"># Validate entrypoint is in predefined list
+if entrypoint not in ['web', 'websecure', 'custom']:
+    raise ValidationError(&quot;Invalid entrypoint&quot;)
+
+# Validate rule syntax (regex check for common mistakes)
+if not _validate_rule_syntax(rule):
+    raise ValidationError(&quot;Invalid routing rule syntax&quot;)
+
+# Validate service exists in current config
+if service not in config_manager.list_services():
+    raise ValidationError(&quot;Referenced service does not exist&quot;)
+</code></pre>
+<h3 id="authentication-authorization">Authentication &amp; Authorization</h3>
+<ul>
+<li><strong>Single-User Focus</strong>: v1.0 single admin account (multi-user in v1.1)</li>
+<li><strong>Password Storage</strong>: werkzeug.security.pbkdf2_sha256 (industry standard)</li>
+<li><strong>Session Management</strong>: Secure cookies (HttpOnly, SameSite=Lax)</li>
+<li><strong>CSRF Protection</strong>: Flask-WTF CSRF tokens on all POST/PUT/DELETE</li>
+</ul>
+<h3 id="secrets-management">Secrets Management</h3>
+<ul>
+<li><strong>etcd URL</strong>: Via environment variable (not hardcoded)</li>
+<li><strong>Flask Secret Key</strong>: Via environment variable (<code>FLASK_SECRET_KEY</code>)</li>
+<li><strong>Credentials</strong>: SQLite local storage (encrypted via werkzeug if deployed)</li>
+</ul>
+<h3 id="audit-trail-v11">Audit Trail (v1.1+)</h3>
+<ul>
+<li>Planned: Log all config changes (who, what, when)</li>
+<li>Planned: Git-like revision history in etcd</li>
+</ul>
+<hr />
+<h2 id="scalability-performance">Scalability &amp; Performance</h2>
+<h3 id="horizontal-scaling">Horizontal Scaling</h3>
+<p><strong>Current</strong>: Stateless Flask app (can run multiple instances).</p>
+<pre><code>Load Balancer
+  ├─→ Flask Instance 1 (port 8090)
+  ├─→ Flask Instance 2 (port 8090)
+  └─→ Flask Instance 3 (port 8090)
+         ↓↓↓ (all share)
+       etcd v3 (single source of truth)
+       SQLite (via network mount or shared storage)
+</code></pre>
+<p><strong>Bottle Necks</strong>:</p>
+<ul>
+<li>SQLite locking on writes (v1.1 → PostgreSQL option)</li>
+<li>etcd throughput (typical: 1k-10k ops/sec per node)</li>
+<li>Cache invalidation latency (eventual consistency, not immediate)</li>
+</ul>
+<h3 id="performance-characteristics">Performance Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Latency</th>
+<th>Scalability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>List 100 routers</td>
+<td>100–500ms</td>
+<td>O(n) etcd keys</td>
+</tr>
+<tr>
+<td>Create 1 router</td>
+<td>50–200ms</td>
+<td>5 etcd writes</td>
+</tr>
+<tr>
+<td>Edit config</td>
+<td>50–200ms</td>
+<td>etcd + SQLite write</td>
+</tr>
+<tr>
+<td>Export backup (100 keys)</td>
+<td>500–2000ms</td>
+<td>O(n) etcd keys</td>
+</tr>
+<tr>
+<td>Import backup (100 keys)</td>
+<td>1–5s</td>
+<td>O(n) etcd writes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Optimization Tips</strong>:</p>
+<ul>
+<li>Use LocalDB (or co-located etcd) for &lt;100ms latency</li>
+<li>Batch export/import to reduce round trips</li>
+<li>Consider etcd cluster for resilience (multi-node)</li>
+</ul>
+<hr />
+<h2 id="extension-points">Extension Points</h2>
+<h3 id="adding-a-new-protocol">Adding a New Protocol</h3>
+<p><strong>Example: QUIC Protocol Support (hypothetical)</strong></p>
+<ol>
+<li>Create directory: <code>app/quic/</code></li>
+<li>Create <code>__init__.py</code> with Blueprint:
+   <code>python
+   bp = Blueprint('quic', __name__)</code></li>
+<li>Create <code>routers/views.py</code> with CRUD endpoints</li>
+<li>Add models in <code>core/models.py</code> (QUICRouter, etc.)</li>
+<li>Register in main <code>app/__init__.py</code>:
+   <code>python
+   from app.quic import bp as quic_bp
+   app.register_blueprint(quic_bp, url_prefix='/quic')</code></li>
+</ol>
+<h3 id="adding-a-new-middleware-type">Adding a New Middleware Type</h3>
+<ol>
+<li>Update <code>MiddlewareType</code> enum in <code>core/models.py</code></li>
+<li>Add builder logic in <code>ConfigManager.create_middleware()</code></li>
+<li>Add form field in <code>app/http/middlewares/views.py</code></li>
+<li>Update template <code>app/http/middlewares/templates/http/middlewares/create.html</code></li>
+</ol>
+<h3 id="custom-validators">Custom Validators</h3>
+<p>Add to <code>core/models.py</code>:</p>
+<pre><code class="language-python">@field_validator('rule')
+@classmethod
+def validate_rule(cls, v):
+    if not v or len(v) &gt; 500:
+        raise ValueError('Rule too long')
+    return v
+</code></pre>
+<hr />
+<h2 id="development-patterns">Development Patterns</h2>
+<h3 id="adding-a-feature">Adding a Feature</h3>
+<p><strong>Step 1: Model</strong> → Define dataclass in <code>core/models.py</code>
+<strong>Step 2: Views</strong> → Create <code>app/myfeature/views.py</code> with CRUD routes
+<strong>Step 3: Templates</strong> → Add <code>app/myfeature/templates/myfeature/</code>
+<strong>Step 4: Register</strong> → Import in <code>app/__init__.py</code></p>
+<h3 id="testing-pattern-v11">Testing Pattern (v1.1)</h3>
+<pre><code class="language-python"># tests/test_http_routers.py
+def test_create_router():
+    client = app.test_client()
+    response = client.post('/routers/create', data={...})
+    assert response.status_code == 302  # Redirect
+    assert config_manager.list_routers()[-1].name == 'test-router'
+</code></pre>
+<h3 id="common-pitfalls">Common Pitfalls</h3>
+<ol>
+<li><strong>Forgetting to cache-bust</strong>: After etcd write, old cache may be stale</li>
+<li><strong>Hardcoding etcd prefix</strong>: Always use <code>state.etcd_client.get_prefix('traefik/')</code></li>
+<li><strong>Skipping validation</strong>: All user input goes through validators</li>
+<li><strong>Not handling exceptions</strong>: etcd can be down; implement fallback UI</li>
+</ol>
+<hr />
+<h2 id="roadmap">Roadmap</h2>
+<h3 id="v10-current">v1.0 (Current)</h3>
+<ul>
+<li>✅ HTTP/TCP/UDP/TLS routing</li>
+<li>✅ Multi-etcd connections (UI)</li>
+<li>✅ Backup/restore</li>
+<li>✅ Light/dark theme</li>
+</ul>
+<h3 id="v11-q1-2026">v1.1 (Q1 2026)</h3>
+<ul>
+<li>🔲 REST API (for automation)</li>
+<li>🔲 Role-based access control (RBAC)</li>
+<li>🔲 Audit logging</li>
+<li>🔲 Test coverage (&gt;80%)</li>
+</ul>
+<h3 id="v12-q2-2026">v1.2 (Q2 2026)</h3>
+<ul>
+<li>🔲 PostgreSQL backend (replace SQLite)</li>
+<li>🔲 Metrics export (Prometheus)</li>
+<li>🔲 Webhook integrations</li>
+<li>🔲 GitOps mode (config-as-code)</li>
+</ul>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://doc.traefik.io/traefik/v2.10/">Traefik Documentation</a></li>
+<li><a href="https://etcd.io/docs/v3.4/api-grpc-gateway/">etcd v3 API</a></li>
+<li><a href="https://flask.palletsprojects.com/en/2.3.x/blueprints/">Flask Blueprints</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">Python Dataclasses</a></li>
+</ul>
+<hr />
+<p><strong>Questions?</strong> See <a href="DEVELOPER_GUIDE.md">DEVELOPER_GUIDE.md</a> or open an issue on GitHub.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/genxnext/traefik-manager" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2098 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Web UI and docs for managing Traefik (etcd v3)">
+      
+      
+        <meta name="author" content="GXNT TECH PVT LTD">
+      
+      
+      
+        <link rel="prev" href="../DEPLOYMENT_GUIDE/">
+      
+      
+        <link rel="next" href="../CHANGELOG/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Contributing - GXNT Traefik Manager</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#contributing-to-gxnt-traefik-manager" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="GXNT Traefik Manager" class="md-header__button md-logo" aria-label="GXNT Traefik Manager" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GXNT Traefik Manager
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Contributing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/genxnext/traefik-manager" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="GXNT Traefik Manager" class="md-nav__button md-logo" aria-label="GXNT Traefik Manager" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    GXNT Traefik Manager
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/genxnext/traefik-manager" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-of-conduct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code of Conduct
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Getting Started">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup-development-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup Development Environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docker-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker Development
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-a-feature-branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create a Feature Branch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-make-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Make Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-commit-early-commit-often" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Commit Early, Commit Often
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-push-to-github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Push to GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-create-a-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Create a Pull Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coding-standards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coding Standards
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Coding Standards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#style-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style Guide
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comments-docstrings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comments &amp; Docstrings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commit-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commit Guidelines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commit Guidelines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#message-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scope-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-request-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull Request Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull Request Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before-submitting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before Submitting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pr-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PR Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#review-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Review Process
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writing-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mocking-etcd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mocking etcd
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-update-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Update Docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reporting-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reporting Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#security-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feature Requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#useful-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Useful Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Questions?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-of-conduct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code of Conduct
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Getting Started">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup-development-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup Development Environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docker-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker Development
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-a-feature-branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create a Feature Branch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-make-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Make Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-commit-early-commit-often" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Commit Early, Commit Often
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-push-to-github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Push to GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-create-a-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Create a Pull Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coding-standards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coding Standards
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Coding Standards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#style-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style Guide
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comments-docstrings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comments &amp; Docstrings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commit-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commit Guidelines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commit Guidelines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#message-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scope-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-request-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull Request Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull Request Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before-submitting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before Submitting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pr-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PR Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#review-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Review Process
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writing-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mocking-etcd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mocking etcd
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-update-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Update Docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reporting-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reporting Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#security-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feature Requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#useful-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Useful Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Questions?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="contributing-to-gxnt-traefik-manager">Contributing to GXNT Traefik Manager</h1>
+<p>Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to the project.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#code-of-conduct">Code of Conduct</a></li>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#development-workflow">Development Workflow</a></li>
+<li><a href="#coding-standards">Coding Standards</a></li>
+<li><a href="#commit-guidelines">Commit Guidelines</a></li>
+<li><a href="#pull-request-process">Pull Request Process</a></li>
+<li><a href="#testing">Testing</a></li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#reporting-issues">Reporting Issues</a></li>
+</ol>
+<hr />
+<h2 id="code-of-conduct">Code of Conduct</h2>
+<p>We are committed to providing a welcoming and inclusive environment for all contributors.</p>
+<ul>
+<li>Be respectful and constructive</li>
+<li>Welcome diverse perspectives</li>
+<li>Focus on the issue, not the person</li>
+<li>Assume good intent</li>
+</ul>
+<hr />
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>Python 3.9+</li>
+<li>Docker (optional, for containerized development)</li>
+<li>Git</li>
+<li>etcd v3.4+ (for testing)</li>
+</ul>
+<h3 id="setup-development-environment">Setup Development Environment</h3>
+<pre><code class="language-bash"># 1. Clone the repository
+git clone https://github.com/genxnext/traefik-manager.git
+cd traefik-manager
+
+# 2. Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt  # Development tools
+
+# 4. Set environment variables
+cp .env.example .env
+export ETCD_URL=http://localhost:2379  # Point to your etcd
+export FLASK_SECRET_KEY=dev-key
+
+# 5. Run locally
+python webui.py
+
+# 6. Access at http://localhost:8090
+</code></pre>
+<h3 id="docker-development">Docker Development</h3>
+<pre><code class="language-bash"># Build dev image
+docker build -f Dockerfile.dev -t traefik-manager:dev .
+
+# Run with hot-reload
+docker compose -f docker-compose.dev.yml up
+</code></pre>
+<hr />
+<h2 id="development-workflow">Development Workflow</h2>
+<h3 id="1-create-a-feature-branch">1. Create a Feature Branch</h3>
+<pre><code class="language-bash"># Update main first
+git checkout main
+git pull origin main
+
+# Create feature branch
+git checkout -b feature/your-feature-name
+# Or for bug fixes: fix/issue-description
+# Or for docs: docs/topic-description
+</code></pre>
+<h3 id="2-make-changes">2. Make Changes</h3>
+<p>Follow the project structure:</p>
+<pre><code>app/
+├─ &lt;feature&gt;/
+│  ├─ __init__.py          # Blueprint registration
+│  ├─ views.py             # Route handlers
+│  └─ templates/           # HTML templates (co-located)
+</code></pre>
+<h3 id="3-commit-early-commit-often">3. Commit Early, Commit Often</h3>
+<pre><code class="language-bash">git add .
+git commit -m &quot;feat: add new middleware type - RateLimitV2&quot;
+</code></pre>
+<h3 id="4-push-to-github">4. Push to GitHub</h3>
+<pre><code class="language-bash">git push origin feature/your-feature-name
+</code></pre>
+<h3 id="5-create-a-pull-request">5. Create a Pull Request</h3>
+<ul>
+<li>Go to GitHub repo</li>
+<li>Click "New Pull Request"</li>
+<li>Fill out PR template with description, linked issues, testing notes</li>
+</ul>
+<hr />
+<h2 id="coding-standards">Coding Standards</h2>
+<h3 id="python-conventions">Python Conventions</h3>
+<pre><code class="language-python"># ✅ Good: Clear, documented, type hints
+def create_http_router(
+    name: str,
+    rule: str,
+    service: str,
+    entrypoint: str = 'web'
+) -&gt; bool:
+    &quot;&quot;&quot;
+    Create a new HTTP router.
+
+    Args:
+        name: Router identifier (must be unique)
+        rule: Traefik routing rule (e.g., Host(`example.com`))
+        service: Reference to existing service
+        entrypoint: Entrypoint to bind to
+
+    Returns:
+        True if successful, False otherwise
+
+    Raises:
+        ValueError: If rule syntax is invalid
+    &quot;&quot;&quot;
+    if not _validate_rule_syntax(rule):
+        raise ValueError(f&quot;Invalid rule: {rule}&quot;)
+
+    # Implementation
+    return state.config_manager.create_router(Router(...))
+
+# ❌ Bad: Unclear, no documentation
+def create_router(name, rule, svc, ep):
+    # Some logic here
+    return something
+</code></pre>
+<h3 id="style-guide">Style Guide</h3>
+<ul>
+<li><strong>PEP 8</strong>: Use <code>black</code> for formatting</li>
+<li><strong>Line length</strong>: 100 characters max</li>
+<li><strong>Imports</strong>: Group standard, third-party, local (isort)</li>
+<li><strong>Type hints</strong>: Always use for function signatures</li>
+</ul>
+<pre><code class="language-bash"># Format code
+black app/ core/
+
+# Check style
+flake8 app/ core/
+isort --check-only app/ core/
+</code></pre>
+<h3 id="comments-docstrings">Comments &amp; Docstrings</h3>
+<pre><code class="language-python"># Bad: Obvious comments
+x = x + 1  # Add 1 to x
+
+# Good: Why, not what
+# Reset attempt counter after successful auth
+attempt_count = 0
+
+# TODO/FIXME must include issue number
+# TODO(issue#42): Implement role-based access control
+</code></pre>
+<hr />
+<h2 id="commit-guidelines">Commit Guidelines</h2>
+<h3 id="message-format">Message Format</h3>
+<pre><code>feat(&lt;scope&gt;): &lt;subject&gt;
+
+&lt;body&gt;
+
+Fixes #&lt;issue-number&gt;
+
+&lt;footer&gt;
+</code></pre>
+<h3 id="examples">Examples</h3>
+<pre><code>feat(http-routers): add priority field to router creation
+  Add optional priority field to HTTP router form
+  Allows manual route precedence control
+  Fixes #123
+
+fix(backup): retrieve all traefik keys with limit=0
+  Root cause: etcd limit defaults to 1000
+  Now uses limit: 0 for unlimited results
+  Fixes #456
+
+docs(deployment): add Kubernetes manifest examples
+  Adds example k8s deployment, service, ingress
+  Includes PVC for SQLite persistence
+  Fixes #789
+
+refactor(models): split large dataclass into smaller ones
+  Improves readability and type safety
+  No functional changes
+</code></pre>
+<h3 id="scope-options">Scope Options</h3>
+<ul>
+<li><code>http-routers</code>, <code>http-services</code>, <code>http-middlewares</code>, <code>http-domains</code></li>
+<li><code>tcp-routers</code>, <code>tcp-services</code></li>
+<li><code>udp-routers</code>, <code>udp-services</code></li>
+<li><code>tls-options</code>, <code>tls-stores</code></li>
+<li><code>auth</code>, <code>backup</code>, <code>config</code>, <code>ui</code>, <code>docs</code></li>
+</ul>
+<h3 id="type-options">Type Options</h3>
+<ul>
+<li><code>feat</code>: New feature</li>
+<li><code>fix</code>: Bug fix</li>
+<li><code>docs</code>: Documentation</li>
+<li><code>refactor</code>: Code reorganization (no functional change)</li>
+<li><code>test</code>: Test additions/modifications</li>
+<li><code>perf</code>: Performance improvements</li>
+<li><code>ci</code>: CI/CD configuration</li>
+<li><code>chore</code>: Maintenance, dependency updates</li>
+</ul>
+<hr />
+<h2 id="pull-request-process">Pull Request Process</h2>
+<h3 id="before-submitting">Before Submitting</h3>
+<ol>
+<li><strong>Test locally</strong>:</li>
+</ol>
+<p><code>bash
+   python -m pytest tests/
+   black --check app/ core/
+   flake8 app/ core/</code></p>
+<ol>
+<li><strong>Update documentation</strong>:</li>
+<li>Update <code>README.md</code> if needed</li>
+<li>Update <code>ARCHITECTURE.md</code> for structural changes</li>
+<li>
+<p>Add docstrings to new functions</p>
+</li>
+<li>
+<p><strong>Run manual tests</strong>:</p>
+</li>
+<li>Test feature works as intended</li>
+<li>Test edge cases (empty input, invalid data)</li>
+<li>Test in both light and dark themes</li>
+</ol>
+<h3 id="pr-checklist">PR Checklist</h3>
+<pre><code class="language-markdown">## Description
+
+Brief description of changes
+
+## Type of Change
+
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing Done
+
+- [ ] Local testing complete
+- [ ] Edge cases tested
+- [ ] No new warnings/errors
+
+## Checklist
+
+- [ ] Code follows style guidelines
+- [ ] Documentation updated
+- [ ] Tests added/updated
+- [ ] No new TODO comments without issue reference
+- [ ] Commits are well-formed
+
+## Related Issues
+
+Fixes #&lt;issue-number&gt;
+</code></pre>
+<h3 id="review-process">Review Process</h3>
+<ol>
+<li><strong>Automated checks</strong> (GitHub Actions):</li>
+<li>Linting</li>
+<li>Type checking</li>
+<li>
+<p>Build verification</p>
+</li>
+<li>
+<p><strong>Human review</strong>:</p>
+</li>
+<li>Code quality</li>
+<li>Architecture alignment</li>
+<li>Performance impact</li>
+<li>
+<p>Security concerns</p>
+</li>
+<li>
+<p><strong>Approval &amp; Merge</strong>:</p>
+</li>
+<li>Pull request requires 1+ approval from maintainers</li>
+<li>Automatic merge on approved + passing checks</li>
+</ol>
+<hr />
+<h2 id="testing">Testing</h2>
+<h3 id="running-tests">Running Tests</h3>
+<pre><code class="language-bash"># Install dev dependencies
+pip install -r requirements-dev.txt
+
+# Run all tests
+pytest
+
+# Run specific test
+pytest tests/test_http_routers.py::test_create_router
+
+# With coverage
+pytest --cov=app --cov=core tests/
+</code></pre>
+<h3 id="writing-tests">Writing Tests</h3>
+<pre><code class="language-python"># tests/test_http_routers.py
+
+import pytest
+from flask import Flask
+from app import create_app
+
+@pytest.fixture
+def client():
+    &quot;&quot;&quot;Create test client&quot;&quot;&quot;
+    app = create_app()
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
+
+def test_list_routers(client):
+    &quot;&quot;&quot;Test listing HTTP routers&quot;&quot;&quot;
+    response = client.get('/routers')
+    assert response.status_code == 302  # Redirect to login
+
+def test_list_routers_authenticated(client, auth):
+    &quot;&quot;&quot;Test listing routers when authenticated&quot;&quot;&quot;
+    auth.login()
+    response = client.get('/routers')
+    assert response.status_code == 200
+    assert b'Routers' in response.data
+
+def test_create_router_validation(client, auth):
+    &quot;&quot;&quot;Test router creation validates input&quot;&quot;&quot;
+    auth.login()
+
+    # Missing required fields
+    response = client.post('/routers/create', data={})
+    assert response.status_code == 400
+    assert b'required' in response.data.lower()
+
+    # Invalid rule syntax
+    response = client.post('/routers/create', data={
+        'name': 'test',
+        'rule': 'INVALID-RULE',
+        'service': 'existing-service'
+    })
+    assert response.status_code == 400
+</code></pre>
+<h3 id="mocking-etcd">Mocking etcd</h3>
+<pre><code class="language-python">from unittest.mock import patch, MagicMock
+
+@patch('core.etcd_client.ETCDClient.get_prefix')
+def test_export_backup(mock_get_prefix):
+    &quot;&quot;&quot;Test backup export with mocked etcd&quot;&quot;&quot;
+    mock_get_prefix.return_value = {
+        'traefik/http/routers/test/rule': 'Host(`test.com`)',
+        'traefik/http/services/test/url': 'http://backend:80'
+    }
+
+    # Your test here
+    assert len(result) == 2
+</code></pre>
+<hr />
+<h2 id="documentation">Documentation</h2>
+<h3 id="when-to-update-docs">When to Update Docs</h3>
+<ul>
+<li><strong>New feature</strong>: Update <code>ARCHITECTURE.md</code> and <code>DEVELOPER_GUIDE.md</code></li>
+<li><strong>API change</strong>: Update docstrings and README</li>
+<li><strong>New protocol support</strong>: Update architecture diagrams</li>
+<li><strong>Deployment changes</strong>: Update <code>DEPLOYMENT_GUIDE.md</code></li>
+</ul>
+<h3 id="documentation-format">Documentation Format</h3>
+<pre><code class="language-markdown"># Section Title
+
+Introductory paragraph.
+
+## Subsection
+
+### Code Example
+
+\`\`\`python
+
+# Code here
+
+\`\`\`
+
+### Diagram
+
+\`\`\`
+ASCII diagram or link to image
+\`\`\`
+
+## Related Links
+
+- [Other doc](OTHER.md)
+- [External resource](https://example.com)
+</code></pre>
+<hr />
+<h2 id="reporting-issues">Reporting Issues</h2>
+<h3 id="security-issues">Security Issues</h3>
+<p>⚠️ <strong>Do not open GitHub issues for security vulnerabilities!</strong></p>
+<p>Email: samirm@genxnext.com with details.</p>
+<h3 id="bug-reports">Bug Reports</h3>
+<pre><code class="language-markdown">## Description
+
+Brief description of the bug
+
+## Steps to Reproduce
+
+1. Step one
+2. Step two
+3. ...
+
+## Expected Behavior
+
+What should happen
+
+## Actual Behavior
+
+What actually happens
+
+## Environment
+
+- OS: macOS/Linux/Windows
+- Python version: 3.9/3.10/3.11
+- Docker version (if applicable): 20.10+
+- etcd version: v3.4/3.5
+
+## Screenshots (if applicable)
+
+Attach images
+
+## Additional Context
+
+Any other relevant information
+</code></pre>
+<h3 id="feature-requests">Feature Requests</h3>
+<pre><code class="language-markdown">## Summary
+
+Brief summary of the feature
+
+## Motivation
+
+Why is this needed?
+
+## Proposed Solution
+
+How would you solve it?
+
+## Alternatives Considered
+
+Are there other approaches?
+
+## Additional Context
+
+Examples, links, references
+</code></pre>
+<hr />
+<h2 id="development-tips">Development Tips</h2>
+<h3 id="useful-commands">Useful Commands</h3>
+<pre><code class="language-bash"># View current changes
+git diff
+
+# Stage interactively
+git add -p
+
+# Amend last commit
+git commit --amend
+
+# Rebase on main (clean history)
+git rebase -i origin/main
+
+# View commit history
+git log --oneline --graph --all
+</code></pre>
+<h3 id="debugging">Debugging</h3>
+<pre><code class="language-python"># Using Flask shell
+flask shell
+
+# Using pudb (better than pdb)
+pip install pudb
+# Then: set_trace()  # or breakpoint()
+
+# Inspect etcd
+etcdctl get /traefik/ --prefix
+</code></pre>
+<h3 id="common-issues">Common Issues</h3>
+<p><strong>Issue</strong>: Import errors when running locally</p>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-bash">export PYTHONPATH=$PYTHONPATH:$(pwd)
+python webui.py
+</code></pre>
+<p><strong>Issue</strong>: etcd connection timeout</p>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-bash"># Verify etcd running
+docker ps | grep etcd
+# Or start with compose
+docker compose up etcd -d
+</code></pre>
+<p><strong>Issue</strong>: SQLite locked (file is being used)</p>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-bash"># Close all connections
+pkill -f &quot;webui.py&quot;
+# Remove lock file if present
+rm -f ./data/traefik_manager.db-wal
+</code></pre>
+<hr />
+<h2 id="questions">Questions?</h2>
+<ul>
+<li>Read <a href="../ARCHITECTURE/">ARCHITECTURE.md</a></li>
+<li>Check <a href="DEVELOPER_GUIDE.md">DEVELOPER_GUIDE.md</a></li>
+<li>Open a discussion on GitHub</li>
+<li>Email: samirm@genxnext.com</li>
+</ul>
+<hr />
+<p>Thank you for contributing! 🎉</p>
+<hr />
+<p><strong>Last Updated</strong>: February 2026<br />
+<strong>Maintainer</strong>: GXNT TECH PVT LTD</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/genxnext/traefik-manager" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

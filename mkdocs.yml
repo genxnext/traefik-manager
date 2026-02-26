@@ -1,0 +1,22 @@
+site_name: GXNT Traefik Manager
+site_description: Web UI and docs for managing Traefik (etcd v3)
+site_author: GXNT TECH PVT LTD
+repo_url: https://github.com/genxnext/traefik-manager
+docs_dir: site_src
+site_dir: docs
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Getting Started: README.md
+  - Architecture: ARCHITECTURE.md
+  - Deployment: DEPLOYMENT_GUIDE.md
+  - Contributing: CONTRIBUTING.md
+  - Changelog: CHANGELOG.md
+  - Security: SECURITY.md
+plugins:
+  - search
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/genxnext/traefik-manager
