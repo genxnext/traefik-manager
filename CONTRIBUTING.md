@@ -67,7 +67,7 @@ uv sync
 
 # 5. Set environment variables
 cp .env.example .env
-export ETCD_URL=http://localhost:2379
+export ETCD_URL=http://localhost:2379   # Point to your etcd
 export FLASK_SECRET_KEY=dev-key
 
 # 6. Run locally
