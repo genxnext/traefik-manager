@@ -8,12 +8,29 @@
 # Clone & enter project
 cd traefik_manager
 
+---
+
+### Option 1: Using uv (Recommended)
 # Create virtual environment
 uv venv
+# Activate environment (Linux/macOS)
 source .venv/bin/activate
-
 # Install dependencies
 uv sync
+
+---
+
+### Option 2: Using pip + venv
+# Create virtual environment
+python -m venv .venv
+# Activate environment (Linux/macOS)
+source .venv/bin/activate
+# Upgrade pip (recommended)
+pip install --upgrade pip
+# Install dependencies
+pip install -r requirements.txt
+
+---
 
 # Set environment variables
 export ETCD_URL=http://localhost:2379

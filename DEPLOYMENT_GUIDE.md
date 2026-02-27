@@ -375,15 +375,30 @@ CREATE TABLE etcd_connections (
 
 For production deployments with multiple instances, PostgreSQL is recommended:
 
+Install the PostgreSQL driver:
+
+### Install Dependency
+
 ```bash
-# Requirements
+# Option A: Using uv (Recommended)
 uv add psycopg2-binary
 
-# Connection string
-DATABASE_URL=postgresql://user:password@db:5432/traefik_manager
+# Option B: Using pip (Uncomment next line and run)
+# pip install psycopg2-binary
+```
+## Database Configuration
+
+Set the PostgreSQL connection string as an environment variable:
+
+```bash
+DATABASE_URL=postgresql://<username>:<password>@<host>:<port>/<database_name>
 ```
 
----
+### Example
+
+```bash
+DATABASE_URL=postgresql://user:password@db:5432/traefik_manager
+```
 
 ## Security Hardening
 
