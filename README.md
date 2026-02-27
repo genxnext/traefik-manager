@@ -105,9 +105,28 @@ See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for full manifests and setup.
 
 ### Manual
 
+## Using uv (Recommended)
+
 ```bash
+uv sync
+export ETCD_URL=http://localhost:2379
+export FLASK_SECRET_KEY=your-key
+python webui.py
+```
+
+---
+
+## Using pip (If uv is not installed)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+pip install --upgrade pip
 pip install -r requirements.txt
-export ETCD_URL=http://localhost:2379 FLASK_SECRET_KEY=your-key
+
+export ETCD_URL=http://localhost:2379
+export FLASK_SECRET_KEY=your-key
 python webui.py
 ```
 
@@ -115,11 +134,30 @@ python webui.py
 
 ## 🧑‍💻 Development
 
+## Using uv (Recommended)
+
 ```bash
-python3 -m venv .venv
+uv venv
 source .venv/bin/activate
+uv sync
+export ETCD_URL=http://localhost:2379
+export FLASK_SECRET_KEY=dev-key
+python webui.py
+```
+
+---
+
+## Using pip
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+pip install --upgrade pip
 pip install -r requirements.txt
-export ETCD_URL=http://localhost:2379 FLASK_SECRET_KEY=dev-key
+
+export ETCD_URL=http://localhost:2379
+export FLASK_SECRET_KEY=dev-key
 python webui.py
 ```
 

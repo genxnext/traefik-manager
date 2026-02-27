@@ -6,11 +6,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Install uv using pip (no curl needed)
+RUN pip install --no-cache-dir uv
+
+# Copy dependency files first (better caching)
+COPY pyproject.toml uv.lock* ./
+# Install dependencies
+RUN uv sync --frozen
 
 COPY . .
 
 EXPOSE 8090
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8090", "--workers", "2", "--threads", "4", "--timeout", "60", "webui:app"]
+CMD ["uv", "run", "gunicorn", "--bind", "0.0.0.0:8090", "--workers", "2", "--threads", "4", "--timeout", "60", "webui:app"]

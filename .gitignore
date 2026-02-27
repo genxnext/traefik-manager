@@ -9,6 +9,9 @@ __pycache__/
 .venv/
 venv/
 
+# environment variables
+.env
+
 # Runtime data
 *.db
 *.log
