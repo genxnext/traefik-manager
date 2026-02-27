@@ -141,7 +141,7 @@ def _available_cert_resolvers() -> list[str]:
     # Import here to always pick up the *current* config_manager reference.
     from app import globals as state  # noqa: PLC0415
 
-    resolvers: set[str] = {'letsencrypt'}
+    resolvers: set[str] = {'le'}
     try:
         for domain in state.config_manager.get_domains():
             if getattr(domain, 'cert_resolver', ''):

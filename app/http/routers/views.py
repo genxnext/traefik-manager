@@ -81,7 +81,7 @@ def create_router():
     entrypoints        = _normalize_multi(request.form.getlist('entrypoints'))
     middlewares_sel    = _normalize_multi(request.form.getlist('middlewares'))
     enable_tls         = request.form.get('enable_tls') == 'on'
-    cert_resolver      = request.form.get('cert_resolver', 'letsencrypt').strip()
+    cert_resolver      = request.form.get('cert_resolver', 'le').strip()
     tls_options_value  = request.form.get('tls_options', '').strip()
     priority           = _parse_int(request.form.get('priority', '0'))
 
@@ -192,7 +192,7 @@ def edit_router(name):
             'service':       existing.service,
             'entrypoints':   existing.entrypoints,
             'enable_tls':    bool(existing.tls),
-            'cert_resolver': _tls_cert_resolver_value(existing.tls) if existing.tls else 'letsencrypt',
+            'cert_resolver': _tls_cert_resolver_value(existing.tls) if existing.tls else 'le',
             'tls_options':   existing.tls.options if existing.tls else '',
             'priority':      existing.priority,
         }
@@ -219,7 +219,7 @@ def edit_router(name):
     entrypoints       = _normalize_multi(request.form.getlist('entrypoints'))
     middlewares_sel   = _normalize_multi(request.form.getlist('middlewares'))
     enable_tls        = request.form.get('enable_tls') == 'on'
-    cert_resolver     = request.form.get('cert_resolver', 'letsencrypt').strip()
+    cert_resolver     = request.form.get('cert_resolver', 'le').strip()
     tls_options_value = request.form.get('tls_options', '').strip()
     priority          = _parse_int(request.form.get('priority', '0'))
 

@@ -109,7 +109,7 @@
                         <label for="cert_resolver" class="form-label">Certificate Resolver</label>
                         <select class="form-select" id="cert_resolver" name="cert_resolver">
                             {% for resolver in cert_resolvers %}
-                            <option value="{{ resolver }}" {% if (form_data.get('cert_resolver', 'letsencrypt') if form_data else 'letsencrypt') == resolver %}selected{% endif %}>{{ resolver }}</option>
+                            <option value="{{ resolver }}" {% if (form_data.get('cert_resolver', 'le') if form_data else 'le') == resolver %}selected{% endif %}>{{ resolver }}</option>
                             {% endfor %}
                         </select>
                     </div>
