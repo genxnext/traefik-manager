@@ -46,22 +46,35 @@ git clone https://github.com/genxnext/traefik-manager.git
 cd traefik-manager
 
 # 2. Create virtual environment
-python3 -m venv .venv
+
+# Option A: Using uv (Recommended)
+uv venv
+
+# Option B: Using pip + venv (uncomment and run)
+# python -m venv .venv
+
+# 3. Activate virtual environment
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# 3. Install dependencies
-pip install -r requirements.txt
-pip install -r requirements-dev.txt  # Development tools
+# 4. Install dependencies
 
-# 4. Set environment variables
+# If using uv
+uv sync
+
+# If using pip (uncomment next 2 line and run)
+# pip install --upgrade pip
+# pip install -r requirements.txt
+
+# 5. Set environment variables
 cp .env.example .env
-export ETCD_URL=http://localhost:2379  # Point to your etcd
+export ETCD_URL=http://localhost:2379   # Point to your etcd
 export FLASK_SECRET_KEY=dev-key
 
-# 5. Run locally
+# 6. Run locally
 python webui.py
 
-# 6. Access at http://localhost:8090
+# 7. Access at
+# http://localhost:8090
 ```
 
 ### Docker Development
@@ -332,8 +345,15 @@ Fixes #<issue-number>
 ### Running Tests
 
 ```bash
-# Install dev dependencies
-pip install -r requirements-dev.txt
+# Install development dependencies
+
+#   If using uv
+uv sync
+
+#   If using pip (uncomment and run)
+# pip install --upgrade pip
+# pip install -r requirements.txt
+# pip install -r requirements-dev.txt  # if dev deps are separate
 
 # Run all tests
 pytest
@@ -341,7 +361,7 @@ pytest
 # Run specific test
 pytest tests/test_http_routers.py::test_create_router
 
-# With coverage
+# Run with coverage
 pytest --cov=app --cov=core tests/
 ```
 
@@ -546,12 +566,21 @@ git log --oneline --graph --all
 ### Debugging
 
 ```python
-# Using Flask shell
+# Open Flask shell
 flask shell
 
-# Using pudb (better than pdb)
-pip install pudb
-# Then: set_trace()  # or breakpoint()
+# Install and use pudb (better than pdb)
+
+# If using uv
+uv add pudb
+
+# If using pip (uncomment next line and run)
+# pip install pudb
+
+# Then in your code:
+# from pudb import set_trace; set_trace()
+# or simply use:
+# breakpoint()
 
 # Inspect etcd
 etcdctl get /traefik/ --prefix
